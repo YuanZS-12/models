@@ -1,0 +1,35 @@
+{
+  "input": "workspace/cad/DJI_Mavic_3_Pro_Unfolded_Realistic.step",
+  "mode": "view",
+  "outputs": [
+    {
+      "path": "/Users/albert/workspace/cad/snapshots/DJI_Mavic_3_Pro_Unfolded_Realistic_iso.png",
+      "camera": "iso",
+      "width": 1600,
+      "height": 1200
+    },
+    {
+      "path": "/Users/albert/workspace/cad/snapshots/DJI_Mavic_3_Pro_Unfolded_Realistic_front.png",
+      "camera": "front",
+      "width": 1600,
+      "height": 1200
+    },
+    {
+      "path": "/Users/albert/workspace/cad/snapshots/DJI_Mavic_3_Pro_Unfolded_Realistic_top.png",
+      "camera": "top",
+      "width": 1600,
+      "height": 1200
+    },
+    {
+      "path": "/Users/albert/workspace/cad/snapshots/DJI_Mavic_3_Pro_Unfolded_Realistic_right.png",
+      "camera": "right",
+      "width": 1600,
+      "height": 1200
+    }
+  ],
+  "render": {
+    "viewLabels": true,
+    "padding": 0.12,
+    "sizeProfile": "diagnostic"
+  }
+}
