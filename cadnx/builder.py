@@ -818,6 +818,69 @@ class NXBuilder:
         builder.Destroy()
         return feature
 
+    def revolved_profile(self, points, axis_point=(0, 0, 0), axis_direction=(0, 0, 1), angle_degrees=360.0):
+        """
+        Create a revolved solid from radial/Z profile points.
+
+        `points` are `(radius, z)` pairs relative to `axis_point` and
+        `axis_direction`. The profile is closed automatically and revolved by
+        `angle_degrees`. Returns Feature.
+        """
+        if len(points) < 3:
+            raise ValueError("revolved_profile requires at least three profile points.")
+        angle_degrees = float(angle_degrees)
+        if angle_degrees <= 0.0 or angle_degrees > 360.0:
+            raise ValueError("revolved_profile angle_degrees must be in (0, 360].")
+
+        axis_point = self._tuple3(axis_point)
+        axis_direction = self._unit_vector(axis_direction)
+        radial_axis = self._perpendicular_unit(axis_direction)
+
+        absolute_points = []
+        for radius, z_offset in points:
+            radius = float(radius)
+            z_offset = float(z_offset)
+            if radius < 0.0:
+                raise ValueError("revolved_profile radius values must be nonnegative.")
+            absolute_points.append(
+                self._add_vectors(
+                    self._add_vectors(axis_point, self._scale_vector(radial_axis, radius)),
+                    self._scale_vector(axis_direction, z_offset),
+                )
+            )
+
+        curves = []
+        for index, start_tuple in enumerate(absolute_points):
+            end_tuple = absolute_points[(index + 1) % len(absolute_points)]
+            curves.append(self.part.Curves.CreateLine(self._point3d(start_tuple), self._point3d(end_tuple)))
+
+        section = self.part.Sections.CreateSection(0.0095, 0.01, 0.5)
+        for curve in curves:
+            rule = self.part.ScRuleFactory.CreateRuleCurveDumb([curve])
+            section.AddToSection(
+                [rule],
+                curve,
+                None,
+                None,
+                curve.StartPoint,
+                NXOpen.Section.Mode.Create,
+                False,
+            )
+
+        builder = self.part.Features.CreateRevolveBuilder(None)
+        builder.Section = section
+        axis = self.part.Axes.CreateAxis(
+            self._point3d(axis_point),
+            self._vector3d(axis_direction),
+            NXOpen.SmartObject.UpdateOption.WithinModeling,
+        )
+        builder.Axis = axis
+        builder.Limits.StartExtend.Value.RightHandSide = "0"
+        builder.Limits.EndExtend.Value.RightHandSide = str(angle_degrees)
+        feature = builder.CommitFeature()
+        builder.Destroy()
+        return feature
+
     # Boolean operations
 
     def boolean_subtract(self, target, tool):
@@ -1110,6 +1173,13 @@ class NXBuilder:
         if length <= 1e-12:
             raise ValueError("Vector length must be nonzero.")
         return tuple(value / length for value in values)
+
+    def _perpendicular_unit(self, values):
+        axis = self._unit_vector(values)
+        reference = (1.0, 0.0, 0.0)
+        if abs(self._dot(axis, reference)) > 0.9:
+            reference = (0.0, 1.0, 0.0)
+        return self._unit_vector(self._cross(axis, reference))
 
     def _metric_key(self, screw_size):
         text = str(screw_size).strip().lower().replace(" ", "")
