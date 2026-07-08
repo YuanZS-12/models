@@ -2,17 +2,12 @@
 # ----------------------------------------------------------------------------
 # HOW TO RUN:
 #   1. Copy this file and the cadnx/ folder to a machine with Siemens NX installed.
-#      The easiest layout is:
-#          output/
-#              servo_motor_mounting_bracket_assembly.py
-#              cadnx/
 #   2. Open NX -> File -> Execute -> NX Open -> select this file.
 #   3. NX builds the geometry and exports the STEP file next to this journal.
 # ----------------------------------------------------------------------------
 
 import os
 import sys
-
 
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 for _candidate in (
@@ -28,219 +23,228 @@ from cadnx import NXBuilder
 def build(output_path: str = None):
     b = NXBuilder()
 
-    # Independent prompt parameters, millimeters.
-    base_length = 100.0
-    base_width = 70.0
+    # Primary dimensions.
+    base_length = 120.0
+    base_width = 72.0
     base_thickness = 10.0
-    motor_plate_length_x = 70.0
-    motor_plate_thickness_y = 12.0
-    motor_plate_height_z = 80.0
-    pilot_bore_diameter = 38.0
-    pilot_center_z = 48.0
-    motor_hole_diameter = 5.5
-    motor_hole_square_pitch = 50.0
-    base_hole_diameter = 6.6
-    base_hole_x_offset = 35.0
-    base_hole_y_offset = 24.0
-    rib_thickness_x = 8.0
-    rib_projection_y = 36.0
-    rib_height_z = 46.0
-    clamp_plate_length_x = 70.0
-    clamp_plate_thickness_y = 8.0
-    clamp_plate_height_z = 50.0
-    clamp_hole_diameter = 5.5
-    clamp_hole_x_offset = 20.0
-    cable_slot_length_x = 28.0
-    cable_slot_width_z = 9.0
-    cable_slot_depth_y = 2.0
-    outer_fillet_radius = 3.0
-    rib_transition_fillet_radius = 2.0
-    hole_chamfer_offset = 0.6
+    base_top_chamfer = 3.0
+    base_bottom_chamfer = 1.5
 
-    # Derived layout and boolean robustness parameters.
+    rear_wall_length = 120.0
+    rear_wall_thickness = 10.0
+    rear_wall_height = 58.0
+    rear_wall_fillet = 4.0
+
+    ear_thickness_x = 14.0
+    ear_width_y = 42.0
+    ear_height_above_base = 54.0
+    ear_center_offsets_x = (-18.0, 18.0)
+    ear_base_y_min = 6.0
+    ear_boss_diameter = 22.0
+    ear_boss_proud_x = 4.0
+    pin_hole_diameter = 12.0
+    pin_hole_center = (0.0, 30.0, 42.0)
+    pin_hole_chamfer = 1.5
+
+    mounting_hole_diameter = 6.6
+    mounting_hole_depth = base_thickness + 2.0
+    mounting_counterbore_diameter = 11.0
+    mounting_counterbore_depth = 5.0
+    mounting_hole_centers = [
+        (-42.0, -22.0),
+        (-42.0, 22.0),
+        (42.0, -22.0),
+        (42.0, 22.0),
+    ]
+
+    pocket_length_x = 32.0
+    pocket_width_y = 16.0
+    pocket_depth_z = 4.0
+    pocket_centers = [(-28.0, 0.0), (28.0, 0.0)]
+
+    rear_wall_hole_diameter = 14.0
+    rear_wall_hole_centers_x = (-36.0, 0.0, 36.0)
+    rear_wall_hole_z = 38.0
+
+    gusset_thickness_x = 8.0
+    gusset_centers_x = (-48.0, -16.0, 16.0, 48.0)
+    gusset_depth_y = 34.0
+    gusset_height_z = 42.0
+    gusset_fillet = 2.0
+
+    front_rail_length = 80.0
+    front_rail_width = 6.0
+    front_rail_height = 4.0
+    front_rail_center = (0.0, -28.0)
+    front_slot_length_x = 4.0
+    front_slot_width_y = 8.0
+    front_slot_depth_z = 2.0
+    front_slot_centers_x = (-25.0, 25.0)
+
     feature_overlap = 0.5
-    cutter_overlap = 1.0
     through_overcut = 2.0
-    base_x0 = -base_length / 2.0
-    base_y0 = -base_width / 2.0
-    base_z0 = 0.0
-    base_top_z = base_z0 + base_thickness
-    plate_x0 = -motor_plate_length_x / 2.0
-    plate_y0 = base_width / 2.0 - motor_plate_thickness_y
-    plate_z0 = base_top_z - feature_overlap
-    plate_front_y = plate_y0
-    plate_rear_y = plate_y0 + motor_plate_thickness_y
-    plate_hole_depth = motor_plate_thickness_y + 2.0 * through_overcut
-    plate_hole_y_start = plate_front_y - through_overcut
-    base_hole_depth = base_thickness + 2.0 * through_overcut
-    base_hole_z_start = base_top_z + through_overcut
-    clamp_z0 = pilot_center_z - clamp_plate_height_z / 2.0
-    clamp_y0 = plate_rear_y + feature_overlap
-    clamp_hole_depth = clamp_plate_thickness_y + 2.0 * through_overcut
-    clamp_hole_y_start = clamp_y0 + clamp_plate_thickness_y + through_overcut
-    motor_offset = motor_hole_square_pitch / 2.0
-    rib_centers_x = (-22.0, 22.0)
-    rib_x_start_offset = -rib_thickness_x / 2.0
+    cutter_overlap = 0.5
+
+    base_top_z = base_thickness
+    rear_wall_y_min = base_width / 2.0
+    rear_wall_y_max = rear_wall_y_min + rear_wall_thickness
+    rear_wall_y_center = (rear_wall_y_min + rear_wall_y_max) / 2.0
+    rear_wall_z_min = base_top_z - feature_overlap
+    rear_wall_height_total = rear_wall_height + feature_overlap
+    ear_z_min = base_top_z - feature_overlap
+    ear_height_total = ear_height_above_base + feature_overlap
+    pin_hole_start_x = pin_hole_center[0] - ear_boss_diameter / 2.0 - cutter_overlap
+    pin_hole_depth = ear_boss_diameter + 2.0 * ear_thickness_x + 2.0 * ear_boss_proud_x + 2.0 * through_overcut
+    front_rail_z_min = base_top_z
 
     b.require_positive(
         base_length=base_length,
         base_width=base_width,
         base_thickness=base_thickness,
-        motor_plate_height_z=motor_plate_height_z,
-        pilot_bore_diameter=pilot_bore_diameter,
-        rib_thickness_x=rib_thickness_x,
-        clamp_plate_height_z=clamp_plate_height_z,
+        rear_wall_length=rear_wall_length,
+        rear_wall_thickness=rear_wall_thickness,
+        rear_wall_height=rear_wall_height,
+        ear_thickness_x=ear_thickness_x,
+        ear_width_y=ear_width_y,
+        ear_height_above_base=ear_height_above_base,
+        pin_hole_diameter=pin_hole_diameter,
+        mounting_hole_diameter=mounting_hole_diameter,
+        pocket_length_x=pocket_length_x,
+        pocket_width_y=pocket_width_y,
+        pocket_depth_z=pocket_depth_z,
+        rear_wall_hole_diameter=rear_wall_hole_diameter,
+        gusset_thickness_x=gusset_thickness_x,
+        gusset_depth_y=gusset_depth_y,
+        gusset_height_z=gusset_height_z,
+        front_rail_length=front_rail_length,
+        front_rail_width=front_rail_width,
+        front_rail_height=front_rail_height,
     )
-    b.require_min_wall(motor_plate_length_x, pilot_bore_diameter, min_wall=8.0, label="motor pilot side wall")
-    b.require_edge_distance(base_length / 2.0 - base_hole_x_offset, base_hole_diameter, min_ratio=1.0, label="base X mounting holes")
-    b.require_edge_distance(base_width / 2.0 - base_hole_y_offset, base_hole_diameter, min_ratio=1.0, label="base Y mounting holes")
-    b.require_feature_budget(boolean_operations=28, micro_holes=10, patterned_features=10)
+    b.require_min_wall(ear_width_y, pin_hole_diameter, min_wall=1.0, label="clevis pin hole")
+    b.require_min_wall(ear_boss_diameter, pin_hole_diameter, min_wall=4.0, label="clevis boss")
+    for center_x, center_y in mounting_hole_centers:
+        b.require_edge_distance(base_length / 2.0 - abs(center_x), mounting_hole_diameter, min_ratio=1.0, label="base mounting X edge")
+        b.require_edge_distance(base_width / 2.0 - abs(center_y), mounting_hole_diameter, min_ratio=1.0, label="base mounting Y edge")
+    b.require_feature_budget(boolean_operations=24, micro_holes=0, patterned_features=0, max_boolean_operations=60, max_micro_holes=20, max_patterned_features=20)
 
-    # Primary aligned solids. Bodies are intentionally not united, producing
-    # separate but registered solids in the exported STEP.
-    base = b.box(base_length, base_width, base_thickness, origin=(base_x0, base_y0, base_z0))
-    motor_plate = b.box(
-        motor_plate_length_x,
-        motor_plate_thickness_y,
-        motor_plate_height_z + feature_overlap,
-        origin=(plate_x0, plate_y0, plate_z0),
+    body = b.box(
+        base_length,
+        base_width,
+        base_thickness,
+        origin=(-base_length / 2.0, -base_width / 2.0, 0.0),
     )
-    clamp_plate = b.box(
-        clamp_plate_length_x,
-        clamp_plate_thickness_y,
-        clamp_plate_height_z,
-        origin=(-clamp_plate_length_x / 2.0, clamp_y0, clamp_z0),
-    )
+    b.chamfer(b.get_top_edges(body), base_top_chamfer)
+    b.chamfer(b.get_bottom_edges(body), base_bottom_chamfer)
 
-    ribs = []
-    rib_points_yz = [
-        (0.0, 0.0),
-        (rib_projection_y, 0.0),
-        (0.0, rib_height_z),
-    ]
-    for rib_center_x in rib_centers_x:
-        rib = b.polygon_prism_on_plane(
-            rib_points_yz,
-            rib_thickness_x,
-            origin=(rib_center_x + rib_x_start_offset, plate_front_y + feature_overlap, base_top_z - feature_overlap),
-            u_axis=(0, -1, 0),
+    rear_wall = b.box(
+        rear_wall_length,
+        rear_wall_thickness,
+        rear_wall_height_total,
+        origin=(-rear_wall_length / 2.0, rear_wall_y_min - feature_overlap, rear_wall_z_min),
+    )
+    b.boolean_unite(body, rear_wall)
+    rear_wall_blend_edges = b.get_edges_in_box(
+        body,
+        min_xyz=(-rear_wall_length / 2.0 - 1.0, rear_wall_y_min - 1.0, base_top_z - 1.0),
+        max_xyz=(rear_wall_length / 2.0 + 1.0, rear_wall_y_min + 1.0, base_top_z + 1.0),
+    )
+    b.fillet(rear_wall_blend_edges, rear_wall_fillet)
+
+    for sign, center_x in zip((-1.0, 1.0), ear_center_offsets_x):
+        ear = b.box(
+            ear_thickness_x,
+            ear_width_y,
+            ear_height_total,
+            origin=(center_x - ear_thickness_x / 2.0, ear_base_y_min, ear_z_min),
+        )
+        b.boolean_unite(body, ear)
+
+        boss_origin_x = center_x - sign * (ear_thickness_x / 2.0 - feature_overlap)
+        boss = b.cylinder(
+            ear_boss_diameter,
+            ear_boss_proud_x + feature_overlap,
+            origin=(boss_origin_x, pin_hole_center[1], pin_hole_center[2]),
+            axis=(sign, 0, 0),
+        )
+        b.boolean_unite(body, boss)
+
+    pin_hole = b.hole(
+        pin_hole_diameter,
+        pin_hole_depth,
+        position=(pin_hole_start_x, pin_hole_center[1], pin_hole_center[2]),
+        direction=(1, 0, 0),
+    )
+    b.boolean_subtract(body, pin_hole)
+
+    # Optional chamfers on the hole openings are intentionally omitted here because
+    # the wrapper does not expose a robust circular-edge selection helper.
+
+    for center_x, center_y in mounting_hole_centers:
+        b.counterbore_hole(
+            body,
+            mounting_hole_diameter,
+            mounting_hole_depth,
+            mounting_counterbore_diameter,
+            mounting_counterbore_depth,
+            position=(center_x, center_y, base_top_z + cutter_overlap),
+            direction=(0, 0, -1),
+        )
+
+    for center_x, center_y in pocket_centers:
+        pocket = b.box(
+            pocket_length_x,
+            pocket_width_y,
+            pocket_depth_z + cutter_overlap,
+            origin=(center_x - pocket_length_x / 2.0, center_y - pocket_width_y / 2.0, base_top_z - pocket_depth_z - cutter_overlap),
+        )
+        b.boolean_subtract(body, pocket)
+
+    for center_x in rear_wall_hole_centers_x:
+        b.hole(
+            rear_wall_hole_diameter,
+            rear_wall_thickness + through_overcut,
+            position=(center_x, rear_wall_y_max + cutter_overlap, rear_wall_hole_z),
+            direction=(0, -1, 0),
+        )
+
+    for center_x in gusset_centers_x:
+        gusset = b.polygon_prism_on_plane(
+            [
+                (0.0, 0.0),
+                (gusset_depth_y, 0.0),
+                (gusset_depth_y, gusset_height_z),
+            ],
+            gusset_thickness_x,
+            origin=(center_x - gusset_thickness_x / 2.0, rear_wall_y_min - gusset_depth_y, base_top_z),
+            u_axis=(0, 1, 0),
             v_axis=(0, 0, 1),
             extrude_axis=(1, 0, 0),
         )
-        ribs.append(rib)
+        b.boolean_unite(body, gusset)
+        b.fillet(b.get_all_edges(gusset), gusset_fillet)
 
-    # Base mounting holes through Z.
-    for hole_x in (-base_hole_x_offset, base_hole_x_offset):
-        for hole_y in (-base_hole_y_offset, base_hole_y_offset):
-            cutter = b.hole(
-                base_hole_diameter,
-                base_hole_depth,
-                position=(hole_x, hole_y, base_hole_z_start),
-                direction=(0, 0, -1),
-            )
-            b.boolean_subtract(base, cutter)
-
-    # Motor pilot and four M5 clearance holes through the vertical plate.
-    pilot = b.hole(
-        pilot_bore_diameter,
-        plate_hole_depth,
-        position=(0.0, plate_hole_y_start, pilot_center_z),
-        direction=(0, 1, 0),
+    rail = b.box(
+        front_rail_length,
+        front_rail_width,
+        front_rail_height + feature_overlap,
+        origin=(front_rail_center[0] - front_rail_length / 2.0, front_rail_center[1] - front_rail_width / 2.0, front_rail_z_min - feature_overlap),
     )
-    b.boolean_subtract(motor_plate, pilot)
-    for hole_x in (-motor_offset, motor_offset):
-        for hole_z in (pilot_center_z - motor_offset, pilot_center_z + motor_offset):
-            cutter = b.hole(
-                motor_hole_diameter,
-                plate_hole_depth,
-                position=(hole_x, plate_hole_y_start, hole_z),
-                direction=(0, 1, 0),
-            )
-            b.boolean_subtract(motor_plate, cutter)
+    b.boolean_unite(body, rail)
 
-    # Rear clamp plate: two M5 clearance holes and shallow cable relief.
-    for hole_x in (-clamp_hole_x_offset, clamp_hole_x_offset):
-        cutter = b.hole(
-            clamp_hole_diameter,
-            clamp_hole_depth,
-            position=(hole_x, clamp_hole_y_start, pilot_center_z),
-            direction=(0, -1, 0),
+    for center_x in front_slot_centers_x:
+        slot = b.box(
+            front_slot_length_x,
+            front_slot_width_y,
+            front_slot_depth_z + cutter_overlap,
+            origin=(center_x - front_slot_length_x / 2.0, front_rail_center[1] - front_slot_width_y / 2.0, front_rail_z_min + front_rail_height - front_slot_depth_z - cutter_overlap),
         )
-        b.boolean_subtract(clamp_plate, cutter)
-    b.slot_cut(
-        clamp_plate,
-        cable_slot_length_x,
-        cable_slot_width_z,
-        cable_slot_depth_y + cutter_overlap,
-        center=(0.0, clamp_y0 - cutter_overlap, pilot_center_z - 15.0),
-        axis=(1, 0, 0),
-        direction=(0, 1, 0),
-    )
-
-    # Industrial edge treatment. Localized selectors avoid large fragile blends.
-    b.fillet(
-        b.get_edges_in_box(
-            base,
-            min_xyz=(base_x0 - 0.1, base_y0 - 0.1, base_z0 - 0.1),
-            max_xyz=(-base_x0 + 0.1, -base_y0 + 0.1, base_top_z + 0.1),
-        ),
-        outer_fillet_radius,
-    )
-    b.fillet(
-        b.get_edges_in_box(
-            motor_plate,
-            min_xyz=(plate_x0 - 0.1, plate_y0 - 0.1, plate_z0 - 0.1),
-            max_xyz=(-plate_x0 + 0.1, plate_rear_y + 0.1, plate_z0 + motor_plate_height_z + 0.2),
-        ),
-        outer_fillet_radius,
-    )
-    for rib in ribs:
-        b.fillet(
-            b.get_edges_in_box(
-                rib,
-                min_xyz=(-50.0, plate_front_y - rib_projection_y - 1.0, base_top_z - 1.0),
-                max_xyz=(50.0, plate_front_y + 1.0, base_top_z + rib_height_z + 1.0),
-            ),
-            rib_transition_fillet_radius,
-        )
-    b.fillet(
-        b.get_edges_in_box(
-            clamp_plate,
-            min_xyz=(-clamp_plate_length_x / 2.0 - 0.1, clamp_y0 - 0.1, clamp_z0 - 0.1),
-            max_xyz=(clamp_plate_length_x / 2.0 + 0.1, clamp_y0 + clamp_plate_thickness_y + 0.1, clamp_z0 + clamp_plate_height_z + 0.1),
-        ),
-        outer_fillet_radius,
-    )
-
-    # Hole-opening chamfers selected around each opening center.
-    for hole_x in (-base_hole_x_offset, base_hole_x_offset):
-        for hole_y in (-base_hole_y_offset, base_hole_y_offset):
-            b.chamfer(b.get_edges_near(base, point=(hole_x, hole_y, base_top_z), tolerance=4.0), hole_chamfer_offset)
-            b.chamfer(b.get_edges_near(base, point=(hole_x, hole_y, base_z0), tolerance=4.0), hole_chamfer_offset)
-    for hole_x, hole_z, tol in [(0.0, pilot_center_z, 20.0)] + [
-        (x, z, 4.0)
-        for x in (-motor_offset, motor_offset)
-        for z in (pilot_center_z - motor_offset, pilot_center_z + motor_offset)
-    ]:
-        b.chamfer(b.get_edges_near(motor_plate, point=(hole_x, plate_front_y, hole_z), tolerance=tol), hole_chamfer_offset)
-        b.chamfer(b.get_edges_near(motor_plate, point=(hole_x, plate_rear_y, hole_z), tolerance=tol), hole_chamfer_offset)
-    for hole_x in (-clamp_hole_x_offset, clamp_hole_x_offset):
-        b.chamfer(b.get_edges_near(clamp_plate, point=(hole_x, clamp_y0, pilot_center_z), tolerance=4.0), hole_chamfer_offset)
-        b.chamfer(
-            b.get_edges_near(clamp_plate, point=(hole_x, clamp_y0 + clamp_plate_thickness_y, pilot_center_z), tolerance=4.0),
-            hole_chamfer_offset,
-        )
+        b.boolean_subtract(body, slot)
 
     if output_path is None:
         output_path = os.path.splitext(os.path.abspath(__file__))[0] + ".step"
+
     b.export_step(output_path)
 
 
-def main():
-    default_output = os.path.splitext(os.path.abspath(__file__))[0] + ".step"
-    output = sys.argv[1] if len(sys.argv) > 1 else default_output
-    build(output)
-
-
 if __name__ == "__main__":
-    main()
+    build()
