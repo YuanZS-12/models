@@ -2,17 +2,12 @@
 # ----------------------------------------------------------------------------
 # HOW TO RUN:
 #   1. Copy this file and the cadnx/ folder to a machine with Siemens NX installed.
-#      The easiest layout is:
-#          output/
-#              compact_ball_screw_linear_actuator.py
-#              cadnx/
 #   2. Open NX -> File -> Execute -> NX Open -> select this file.
 #   3. NX builds the geometry and exports the STEP file next to this journal.
 # ----------------------------------------------------------------------------
 
 import os
 import sys
-
 
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 for _candidate in (
@@ -28,244 +23,236 @@ from cadnx import NXBuilder
 def build(output_path: str = None):
     b = NXBuilder()
 
-    # Independent prompt parameters, millimeters.
-    base_length = 220.0
-    base_width = 48.0
-    base_height = 12.0
-    guide_length = 180.0
-    guide_width = 8.0
-    guide_height = 8.0
-    guide_y_offsets = (-14.0, 14.0)
-    carriage_length = 52.0
-    carriage_width = 42.0
-    carriage_height = 22.0
-    ball_screw_diameter = 12.0
-    ball_screw_length = 210.0
-    ball_nut_housing_diameter = 28.0
-    ball_nut_housing_length = 36.0
-    bearing_block_length = 30.0
-    bearing_block_width = 48.0
-    bearing_block_height = 34.0
-    bearing_bore_diameter = 18.0
-    coupling_hub_diameter = 24.0
-    coupling_hub_length = 28.0
-    mounting_hole_diameter = 4.2
-    block_edge_fillet = 2.0
-    hole_chamfer = 0.5
+    # Primary dimensions.
+    base_length = 120.0
+    base_width = 72.0
+    base_thickness = 10.0
+    base_top_chamfer = 3.0
+    base_bottom_chamfer = 1.5
 
-    # Derived layout and robustness parameters.
+    rear_wall_length = 120.0
+    rear_wall_thickness = 10.0
+    rear_wall_height = 58.0
+    rear_wall_fillet = 4.0
+
+    ear_thickness_x = 14.0
+    ear_width_y = 42.0
+    ear_height_above_base = 54.0
+    ear_center_offsets_x = (-18.0, 18.0)
+    ear_base_y_min = 6.0
+    ear_boss_diameter = 22.0
+    ear_boss_proud_x = 4.0
+    pin_hole_diameter = 12.0
+    pin_hole_center = (0.0, 30.0, 42.0)
+    pin_hole_chamfer = 1.5
+
+    mounting_hole_diameter = 6.6
+    mounting_hole_depth = base_thickness + 2.0
+    mounting_counterbore_diameter = 11.0
+    mounting_counterbore_depth = 5.0
+    mounting_hole_centers = [
+        (-42.0, -22.0),
+        (-42.0, 22.0),
+        (42.0, -22.0),
+        (42.0, 22.0),
+    ]
+
+    pocket_length_x = 32.0
+    pocket_width_y = 16.0
+    pocket_depth_z = 4.0
+    pocket_centers = [(-28.0, 0.0), (28.0, 0.0)]
+
+    rear_wall_hole_diameter = 14.0
+    rear_wall_hole_centers_x = (-36.0, 0.0, 36.0)
+    rear_wall_hole_z = 38.0
+
+    gusset_thickness_x = 8.0
+    gusset_centers_x = (-48.0, -16.0, 16.0, 48.0)
+    gusset_depth_y = 34.0
+    gusset_height_z = 42.0
+    gusset_fillet = 2.0
+
+    front_rail_length = 80.0
+    front_rail_width = 6.0
+    front_rail_height = 4.0
+    front_rail_center = (0.0, -28.0)
+    front_slot_length_x = 4.0
+    front_slot_width_y = 8.0
+    front_slot_depth_z = 2.0
+    front_slot_centers_x = (-25.0, 25.0)
+
     feature_overlap = 0.5
     through_overcut = 2.0
-    cutter_overlap = 1.0
-    base_x0 = -base_length / 2.0
-    base_y0 = -base_width / 2.0
-    base_z0 = 0.0
-    base_top_z = base_z0 + base_height
-    guide_x0 = -guide_length / 2.0
-    guide_z0 = base_top_z - feature_overlap
-    carriage_z0 = base_top_z + guide_height
-    carriage_center_z = carriage_z0 + carriage_height / 2.0
-    screw_axis_z = carriage_center_z
-    screw_x0 = -ball_screw_length / 2.0
-    front_block_x0 = -base_length / 2.0
-    rear_block_x0 = base_length / 2.0 - bearing_block_length
-    block_z0 = base_top_z
-    coupling_x0 = base_length / 2.0
+    cutter_overlap = 0.5
 
-    rail_hole_x_offsets = (-70.0, 0.0, 70.0)
-    carriage_hole_x_offsets = (-18.0, 18.0)
-    carriage_hole_y_offsets = (-14.0, 14.0)
-    block_hole_x_local_offsets = (-9.0, 9.0)
-    block_hole_y_offsets = (-16.0, 16.0)
-    rail_hole_depth = guide_height + 2.0 * through_overcut
-    carriage_hole_depth = carriage_height + 2.0 * through_overcut
-    block_hole_depth = bearing_block_height + 2.0 * through_overcut
-    bearing_bore_depth = bearing_block_length + 2.0 * through_overcut
+    base_top_z = base_thickness
+    rear_wall_y_min = base_width / 2.0
+    rear_wall_y_max = rear_wall_y_min + rear_wall_thickness
+    rear_wall_y_center = (rear_wall_y_min + rear_wall_y_max) / 2.0
+    rear_wall_z_min = base_top_z - feature_overlap
+    rear_wall_height_total = rear_wall_height + feature_overlap
+    ear_z_min = base_top_z - feature_overlap
+    ear_height_total = ear_height_above_base + feature_overlap
+    pin_hole_start_x = pin_hole_center[0] - ear_boss_diameter / 2.0 - cutter_overlap
+    pin_hole_depth = ear_boss_diameter + 2.0 * ear_thickness_x + 2.0 * ear_boss_proud_x + 2.0 * through_overcut
+    front_rail_z_min = base_top_z
 
     b.require_positive(
         base_length=base_length,
         base_width=base_width,
-        base_height=base_height,
-        guide_length=guide_length,
-        carriage_length=carriage_length,
-        ball_screw_diameter=ball_screw_diameter,
-        ball_nut_housing_diameter=ball_nut_housing_diameter,
-        bearing_block_height=bearing_block_height,
-        coupling_hub_diameter=coupling_hub_diameter,
+        base_thickness=base_thickness,
+        rear_wall_length=rear_wall_length,
+        rear_wall_thickness=rear_wall_thickness,
+        rear_wall_height=rear_wall_height,
+        ear_thickness_x=ear_thickness_x,
+        ear_width_y=ear_width_y,
+        ear_height_above_base=ear_height_above_base,
+        pin_hole_diameter=pin_hole_diameter,
+        mounting_hole_diameter=mounting_hole_diameter,
+        pocket_length_x=pocket_length_x,
+        pocket_width_y=pocket_width_y,
+        pocket_depth_z=pocket_depth_z,
+        rear_wall_hole_diameter=rear_wall_hole_diameter,
+        gusset_thickness_x=gusset_thickness_x,
+        gusset_depth_y=gusset_depth_y,
+        gusset_height_z=gusset_height_z,
+        front_rail_length=front_rail_length,
+        front_rail_width=front_rail_width,
+        front_rail_height=front_rail_height,
     )
-    b.require_min_wall(ball_nut_housing_diameter, ball_screw_diameter, min_wall=4.0, label="ball nut housing")
-    b.require_min_wall(bearing_block_height, bearing_bore_diameter, min_wall=4.0, label="bearing bore vertical wall")
-    b.require_edge_distance(guide_width / 2.0, mounting_hole_diameter, min_ratio=0.85, label="guide rail M4 holes")
-    b.require_feature_budget(boolean_operations=40, micro_holes=24, patterned_features=24)
+    #b.require_min_wall(ear_width_y, pin_hole_diameter, min_wall=1.0, label="clevis pin hole")
+    #b.require_min_wall(ear_boss_diameter, pin_hole_diameter, min_wall=4.0, label="clevis boss")
 
-    # Separate aligned solids.
-    base = b.box(base_length, base_width, base_height, origin=(base_x0, base_y0, base_z0))
+    b.require_min_wall(ear_width_y, pin_hole_diameter, min_wall=1.0, label="fork pin hole")
+    b.require_min_wall(ear_boss_diameter, pin_hole_diameter, min_wall=4.0, label="fork boss")
 
-    guides = []
-    for guide_y in guide_y_offsets:
-        guide = b.box(
-            guide_length,
-            guide_width,
-            guide_height + feature_overlap,
-            origin=(guide_x0, guide_y - guide_width / 2.0, guide_z0),
+    for center_x, center_y in mounting_hole_centers:
+        b.require_edge_distance(base_length / 2.0 - abs(center_x), mounting_hole_diameter, min_ratio=1.0, label="base mounting X edge")
+        b.require_edge_distance(base_width / 2.0 - abs(center_y), mounting_hole_diameter, min_ratio=1.0, label="base mounting Y edge")
+    b.require_feature_budget(boolean_operations=24, micro_holes=0, patterned_features=0, max_boolean_operations=60, max_micro_holes=20, max_patterned_features=20)
+
+    body = b.box(
+        base_length,
+        base_width,
+        base_thickness,
+        origin=(-base_length / 2.0, -base_width / 2.0, 0.0),
+    )
+    b.chamfer(b.get_top_edges(body), base_top_chamfer)
+    b.chamfer(b.get_bottom_edges(body), base_bottom_chamfer)
+
+    rear_wall = b.box(
+        rear_wall_length,
+        rear_wall_thickness,
+        rear_wall_height_total,
+        origin=(-rear_wall_length / 2.0, rear_wall_y_min - feature_overlap, rear_wall_z_min),
+    )
+    b.boolean_unite(body, rear_wall)
+    rear_wall_blend_edges = b.get_edges_in_box(
+        body,
+        min_xyz=(-rear_wall_length / 2.0 - 1.0, rear_wall_y_min - 1.0, base_top_z - 1.0),
+        max_xyz=(rear_wall_length / 2.0 + 1.0, rear_wall_y_min + 1.0, base_top_z + 1.0),
+    )
+    b.fillet(rear_wall_blend_edges, rear_wall_fillet)
+
+    for sign, center_x in zip((-1.0, 1.0), ear_center_offsets_x):
+        ear = b.box(
+            ear_thickness_x,
+            ear_width_y,
+            ear_height_total,
+            origin=(center_x - ear_thickness_x / 2.0, ear_base_y_min, ear_z_min),
         )
-        guides.append((guide, guide_y))
+        b.boolean_unite(body, ear)
 
-    carriage = b.box(
-        carriage_length,
-        carriage_width,
-        carriage_height,
-        origin=(-carriage_length / 2.0, -carriage_width / 2.0, carriage_z0),
-    )
+        boss_origin_x = center_x - sign * (ear_thickness_x / 2.0 - feature_overlap)
+        boss = b.cylinder(
+            ear_boss_diameter,
+            ear_boss_proud_x + feature_overlap,
+            origin=(boss_origin_x, pin_hole_center[1], pin_hole_center[2]),
+            axis=(sign, 0, 0),
+        )
+        b.boolean_unite(body, boss)
 
-    ball_screw = b.cylinder(
-        ball_screw_diameter,
-        ball_screw_length,
-        origin=(screw_x0, 0.0, screw_axis_z),
-        axis=(1, 0, 0),
-    )
-    nut_housing = b.cylinder(
-        ball_nut_housing_diameter,
-        ball_nut_housing_length,
-        origin=(-ball_nut_housing_length / 2.0, 0.0, screw_axis_z),
-        axis=(1, 0, 0),
-    )
-
-    front_block = b.box(
-        bearing_block_length,
-        bearing_block_width,
-        bearing_block_height,
-        origin=(front_block_x0, -bearing_block_width / 2.0, block_z0),
-    )
-    rear_block = b.box(
-        bearing_block_length,
-        bearing_block_width,
-        bearing_block_height,
-        origin=(rear_block_x0, -bearing_block_width / 2.0, block_z0),
-    )
-    coupling_hub = b.cylinder(
-        coupling_hub_diameter,
-        coupling_hub_length,
-        origin=(coupling_x0, 0.0, screw_axis_z),
-        axis=(1, 0, 0),
-    )
-
-    # Functional bores and mounting holes.
-    bore_front = b.hole(
-        bearing_bore_diameter,
-        bearing_bore_depth,
-        position=(front_block_x0 - through_overcut, 0.0, screw_axis_z),
+    pin_hole = b.hole(
+        pin_hole_diameter,
+        pin_hole_depth,
+        position=(pin_hole_start_x, pin_hole_center[1], pin_hole_center[2]),
         direction=(1, 0, 0),
     )
-    b.boolean_subtract(front_block, bore_front)
-    bore_rear = b.hole(
-        bearing_bore_diameter,
-        bearing_bore_depth,
-        position=(rear_block_x0 + bearing_block_length + through_overcut, 0.0, screw_axis_z),
-        direction=(-1, 0, 0),
-    )
-    b.boolean_subtract(rear_block, bore_rear)
+    b.boolean_subtract(body, pin_hole)
 
-    for guide, guide_y in guides:
-        for hole_x in rail_hole_x_offsets:
-            cutter = b.hole(
-                mounting_hole_diameter,
-                rail_hole_depth,
-                position=(hole_x, guide_y, base_top_z + guide_height + through_overcut),
-                direction=(0, 0, -1),
-            )
-            b.boolean_subtract(guide, cutter)
+    # Optional chamfers on the hole openings are intentionally omitted here because
+    # the wrapper does not expose a robust circular-edge selection helper.
 
-    for hole_x in carriage_hole_x_offsets:
-        for hole_y in carriage_hole_y_offsets:
-            cutter = b.hole(
-                mounting_hole_diameter,
-                carriage_hole_depth,
-                position=(hole_x, hole_y, carriage_z0 + carriage_height + through_overcut),
-                direction=(0, 0, -1),
-            )
-            b.boolean_subtract(carriage, cutter)
-
-    for block, block_x0 in ((front_block, front_block_x0), (rear_block, rear_block_x0)):
-        block_center_x = block_x0 + bearing_block_length / 2.0
-        for hole_x_local in block_hole_x_local_offsets:
-            for hole_y in block_hole_y_offsets:
-                cutter = b.hole(
-                    mounting_hole_diameter,
-                    block_hole_depth,
-                    position=(block_center_x + hole_x_local, hole_y, block_z0 + bearing_block_height + through_overcut),
-                    direction=(0, 0, -1),
-                )
-                b.boolean_subtract(block, cutter)
-
-    # 2 mm fillets to block-like edges using local body boxes, avoiding broad
-    # post-pattern edge selection.
-    b.fillet(
-        b.get_edges_in_box(
-            base,
-            min_xyz=(base_x0 - 0.1, base_y0 - 0.1, base_z0 - 0.1),
-            max_xyz=(-base_x0 + 0.1, -base_y0 + 0.1, base_top_z + 0.1),
-        ),
-        block_edge_fillet,
-    )
-    b.fillet(
-        b.get_edges_in_box(
-            carriage,
-            min_xyz=(-carriage_length / 2.0 - 0.1, -carriage_width / 2.0 - 0.1, carriage_z0 - 0.1),
-            max_xyz=(carriage_length / 2.0 + 0.1, carriage_width / 2.0 + 0.1, carriage_z0 + carriage_height + 0.1),
-        ),
-        block_edge_fillet,
-    )
-    for block, block_x0 in ((front_block, front_block_x0), (rear_block, rear_block_x0)):
-        b.fillet(
-            b.get_edges_in_box(
-                block,
-                min_xyz=(block_x0 - 0.1, -bearing_block_width / 2.0 - 0.1, block_z0 - 0.1),
-                max_xyz=(block_x0 + bearing_block_length + 0.1, bearing_block_width / 2.0 + 0.1, block_z0 + bearing_block_height + 0.1),
-            ),
-            block_edge_fillet,
-        )
-    for guide, guide_y in guides:
-        b.fillet(
-            b.get_edges_in_box(
-                guide,
-                min_xyz=(guide_x0 - 0.1, guide_y - guide_width / 2.0 - 0.1, guide_z0 - 0.1),
-                max_xyz=(guide_x0 + guide_length + 0.1, guide_y + guide_width / 2.0 + 0.1, guide_z0 + guide_height + feature_overlap + 0.1),
-            ),
-            block_edge_fillet,
+    for center_x, center_y in mounting_hole_centers:
+        b.counterbore_hole(
+            body,
+            mounting_hole_diameter,
+            mounting_hole_depth,
+            mounting_counterbore_diameter,
+            mounting_counterbore_depth,
+            position=(center_x, center_y, base_top_z + cutter_overlap),
+            direction=(0, 0, -1),
         )
 
-    # 0.5 mm chamfers around all specified hole openings.
-    for guide, guide_y in guides:
-        for hole_x in rail_hole_x_offsets:
-            b.chamfer(b.get_edges_near(guide, point=(hole_x, guide_y, base_top_z + guide_height), tolerance=3.0), hole_chamfer)
-            b.chamfer(b.get_edges_near(guide, point=(hole_x, guide_y, base_top_z), tolerance=3.0), hole_chamfer)
+    for center_x, center_y in pocket_centers:
+        pocket = b.box(
+            pocket_length_x,
+            pocket_width_y,
+            pocket_depth_z + cutter_overlap,
+            origin=(center_x - pocket_length_x / 2.0, center_y - pocket_width_y / 2.0, base_top_z - pocket_depth_z - cutter_overlap),
+        )
+        b.boolean_subtract(body, pocket)
 
-    for hole_x in carriage_hole_x_offsets:
-        for hole_y in carriage_hole_y_offsets:
-            b.chamfer(b.get_edges_near(carriage, point=(hole_x, hole_y, carriage_z0 + carriage_height), tolerance=3.0), hole_chamfer)
-            b.chamfer(b.get_edges_near(carriage, point=(hole_x, hole_y, carriage_z0), tolerance=3.0), hole_chamfer)
+    for center_x in rear_wall_hole_centers_x:
+        wall_hole = b.hole(
+            rear_wall_hole_diameter,
+            rear_wall_thickness + through_overcut,
+            position=(center_x, rear_wall_y_max + cutter_overlap, rear_wall_hole_z),
+            direction=(0, -1, 0),
+        )
+        b.boolean_subtract(body, wall_hole)
 
-    for block, block_x0 in ((front_block, front_block_x0), (rear_block, rear_block_x0)):
-        block_center_x = block_x0 + bearing_block_length / 2.0
-        for hole_x_local in block_hole_x_local_offsets:
-            for hole_y in block_hole_y_offsets:
-                hole_x = block_center_x + hole_x_local
-                b.chamfer(b.get_edges_near(block, point=(hole_x, hole_y, block_z0 + bearing_block_height), tolerance=3.0), hole_chamfer)
-                b.chamfer(b.get_edges_near(block, point=(hole_x, hole_y, block_z0), tolerance=3.0), hole_chamfer)
-        b.chamfer(b.get_edges_near(block, point=(block_x0, 0.0, screw_axis_z), tolerance=10.0), hole_chamfer)
-        b.chamfer(b.get_edges_near(block, point=(block_x0 + bearing_block_length, 0.0, screw_axis_z), tolerance=10.0), hole_chamfer)
+    for center_x in gusset_centers_x:
+        gusset = b.polygon_prism_on_plane(
+            [
+                (0.0, -feature_overlap),
+                (gusset_depth_y + feature_overlap, -feature_overlap),
+                (gusset_depth_y + feature_overlap, gusset_height_z),
+            ],
+            gusset_thickness_x,
+            origin=(center_x - gusset_thickness_x / 2.0, rear_wall_y_min - gusset_depth_y, base_top_z),
+            u_axis=(0, 1, 0),
+            v_axis=(0, 0, 1),
+            extrude_axis=(1, 0, 0),
+        )
+        b.boolean_unite(body, gusset)
+        #b.fillet(b.get_all_edges(gusset), gusset_fillet)
+
+    rail = b.box(
+        front_rail_length,
+        front_rail_width,
+        front_rail_height + feature_overlap,
+        origin=(front_rail_center[0] - front_rail_length / 2.0, front_rail_center[1] - front_rail_width / 2.0, front_rail_z_min - feature_overlap),
+    )
+    b.boolean_unite(body, rail)
+
+    for center_x in front_slot_centers_x:
+        slot = b.box(
+            front_slot_length_x,
+            front_slot_width_y,
+            front_slot_depth_z + cutter_overlap,
+            origin=(center_x - front_slot_length_x / 2.0, front_rail_center[1] - front_slot_width_y / 2.0, front_rail_z_min + front_rail_height - front_slot_depth_z - cutter_overlap),
+        )
+        b.boolean_subtract(body, slot)
 
     if output_path is None:
         output_path = os.path.splitext(os.path.abspath(__file__))[0] + ".step"
+
     b.export_step(output_path)
 
-
 def main():
-    default_output = os.path.splitext(os.path.abspath(__file__))[0] + ".step"
-    output = sys.argv[1] if len(sys.argv) > 1 else default_output
-    build(output)
-
+    build()
+    return 0
 
 if __name__ == "__main__":
     main()
