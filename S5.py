@@ -4,23 +4,18 @@
 #   1. Copy this file and the cadnx/ folder to a machine with Siemens NX installed.
 #      The easiest layout is:
 #          output/
-#              aerospace_quick_release_structural_connector.py
+#              Mp.py
 #              cadnx/
 #   2. Open NX -> File -> Execute -> NX Open -> select this file.
-#   3. NX builds the geometry and exports the STEP file next to this journal.
+#   3. NX builds the geometry and exports the STEP file.
 # ----------------------------------------------------------------------------
 
 import os
 import sys
 
-
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-for _candidate in (
-    _SCRIPT_DIR,
-    os.path.abspath(os.path.join(_SCRIPT_DIR, "..", "skills", "nx-cad")),
-):
-    if _candidate not in sys.path:
-        sys.path.insert(0, _candidate)
+if _SCRIPT_DIR not in sys.path:
+    sys.path.insert(0, _SCRIPT_DIR)
 
 from cadnx import NXBuilder
 
@@ -28,185 +23,39 @@ from cadnx import NXBuilder
 def build(output_path: str = None):
     b = NXBuilder()
 
-    # Independent prompt parameters, millimeters.
-    body_length_x = 76.0
-    body_width_y = 40.0
-    body_height_z = 30.0
-    outer_fillet = 3.0
-    fork_lug_length_x = 34.0
-    fork_lug_thickness_y = 10.0
-    fork_gap_y = 14.0
-    fork_pin_hole_diameter = 12.0
-    tongue_length_x = 30.0
-    tongue_thickness_y = 14.0
-    tongue_height_z = 24.0
-    tongue_pin_hole_diameter = 10.0
-    locking_bore_diameter = 8.0
-    locking_counterbore_diameter = 14.0
-    locking_counterbore_depth = 5.0
-    relief_pocket_length_x = 34.0
-    relief_pocket_height_z = 14.0
-    relief_pocket_depth_y = 4.0
-    safety_wire_hole_diameter = 2.5
-    rib_thickness = 5.0
-    rib_length = 38.0
-    rib_height = 6.0
-    lug_root_fillet = 2.0
-    pocket_fillet = 1.0
-    hole_chamfer = 0.5
+    # Plate parameters in millimeters.
+    length = 60.0
+    width = 40.0
+    thickness = 8.0
+    hole_diameter = 5.5  # M5 normal clearance
+    hole_margin_x = 10.0
+    hole_margin_y = 8.0
 
-    # Derived layout and robustness parameters.
-    feature_overlap = 0.5
-    cutter_overlap = 1.0
-    through_overcut = 2.0
-    body_x0 = -body_length_x / 2.0
-    body_y0 = -body_width_y / 2.0
-    body_z0 = -body_height_z / 2.0
-    body_x1 = body_length_x / 2.0
-    body_y1 = body_width_y / 2.0
-    body_z1 = body_height_z / 2.0
-    fork_y_centers = (
-        -(fork_gap_y / 2.0 + fork_lug_thickness_y / 2.0),
-        fork_gap_y / 2.0 + fork_lug_thickness_y / 2.0,
-    )
-    fork_x0 = body_x1 - feature_overlap
-    fork_pin_x = body_x1 + fork_lug_length_x / 2.0
-    tongue_x0 = body_x0 - tongue_length_x
-    tongue_pin_x = body_x0 - tongue_length_x / 2.0
-    y_cut_depth = body_width_y + 2.0 * through_overcut
-    z_cut_depth = body_height_z + 2.0 * through_overcut
-    side_pocket_centers = ((-14.0, body_y1 + cutter_overlap, 0.0), (14.0, body_y0 - cutter_overlap, 0.0))
+    # Derived hole layout, centered on the plate footprint.
+    hole_x = length / 2.0 - hole_margin_x
+    hole_y = width / 2.0 - hole_margin_y
+    hole_positions = [
+        (-hole_x, -hole_y),
+        (hole_x, -hole_y),
+        (hole_x, hole_y),
+        (-hole_x, hole_y),
+    ]
 
-    b.require_positive(
-        body_length_x=body_length_x,
-        body_width_y=body_width_y,
-        body_height_z=body_height_z,
-        fork_lug_length_x=fork_lug_length_x,
-        fork_lug_thickness_y=fork_lug_thickness_y,
-        tongue_length_x=tongue_length_x,
-        tongue_thickness_y=tongue_thickness_y,
-        locking_bore_diameter=locking_bore_diameter,
-    )
-    b.require_min_wall(fork_lug_thickness_y, fork_pin_hole_diameter, min_wall=1.5, label="fork pin lug")
-    b.require_min_wall(tongue_thickness_y, tongue_pin_hole_diameter, min_wall=1.5, label="tongue pin lug")
-    b.require_min_wall(body_height_z, locking_counterbore_diameter, min_wall=5.0, label="locking counterbore")
-    b.require_feature_budget(boolean_operations=30, micro_holes=6, patterned_features=10)
+    b.require_positive(length=length, width=width, thickness=thickness, hole_diameter=hole_diameter)
+    b.require_feature_budget(boolean_operations=4)
+    b.require_edge_distance(hole_x, hole_diameter, min_ratio=1.0, label="M5 hole X edge distance")
+    b.require_edge_distance(hole_y, hole_diameter, min_ratio=1.0, label="M5 hole Y edge distance")
 
-    connector = b.box(body_length_x, body_width_y, body_height_z, origin=(body_x0, body_y0, body_z0))
+    plate = b.box(length, width, thickness, origin=(-length / 2.0, -width / 2.0, 0.0))
 
-    # +X fork end: two aligned lugs with the requested Y gap.
-    for lug_y in fork_y_centers:
-        lug = b.box(
-            fork_lug_length_x + feature_overlap,
-            fork_lug_thickness_y,
-            body_height_z,
-            origin=(fork_x0, lug_y - fork_lug_thickness_y / 2.0, body_z0),
+    for x, y in hole_positions:
+        b.screw_clearance_hole(
+            plate,
+            "M5",
+            thickness,
+            position=(x, y, thickness),
+            direction=(0, 0, -1),
         )
-        b.boolean_unite(connector, lug)
-
-    # -X tongue end.
-    tongue = b.box(
-        tongue_length_x + feature_overlap,
-        tongue_thickness_y,
-        tongue_height_z,
-        origin=(tongue_x0, -tongue_thickness_y / 2.0, -tongue_height_z / 2.0),
-    )
-    b.boolean_unite(connector, tongue)
-
-    # Diagonal reinforcing ribs, modeled as single-solid overlapped struts.
-    for sign_y in (-1.0, 1.0):
-        for sign_z in (-1.0, 1.0):
-            rib = b.oriented_box(
-                rib_length,
-                rib_thickness,
-                rib_height,
-                center=(body_x1 - 12.0, sign_y * 11.0, sign_z * 9.0),
-                u_axis=(1, 0, 0),
-                v_axis=(0, sign_y, sign_z),
-                w_axis=(0, -sign_z, sign_y),
-            )
-            b.boolean_unite(connector, rib)
-
-    # Pin holes along Y.
-    fork_pin = b.hole(
-        fork_pin_hole_diameter,
-        y_cut_depth,
-        position=(fork_pin_x, body_y0 - through_overcut, 0.0),
-        direction=(0, 1, 0),
-    )
-    b.boolean_subtract(connector, fork_pin)
-    tongue_pin = b.hole(
-        tongue_pin_hole_diameter,
-        y_cut_depth,
-        position=(tongue_pin_x, body_y0 - through_overcut, 0.0),
-        direction=(0, 1, 0),
-    )
-    b.boolean_subtract(connector, tongue_pin)
-
-    # Vertical locking-pin bore and top counterbore.
-    lock_bore = b.hole(
-        locking_bore_diameter,
-        z_cut_depth,
-        position=(0.0, 0.0, body_z1 + through_overcut),
-        direction=(0, 0, -1),
-    )
-    b.boolean_subtract(connector, lock_bore)
-    lock_counterbore = b.hole(
-        locking_counterbore_diameter,
-        locking_counterbore_depth + cutter_overlap,
-        position=(0.0, 0.0, body_z1 + cutter_overlap),
-        direction=(0, 0, -1),
-    )
-    b.boolean_subtract(connector, lock_counterbore)
-
-    # Side relief pockets on opposite sides of the central body.
-    for pocket_x, pocket_y, pocket_z in side_pocket_centers:
-        pocket = b.box(
-            relief_pocket_length_x,
-            relief_pocket_depth_y + cutter_overlap,
-            relief_pocket_height_z,
-            origin=(
-                pocket_x - relief_pocket_length_x / 2.0,
-                pocket_y - (relief_pocket_depth_y + cutter_overlap) if pocket_y > 0 else pocket_y,
-                pocket_z - relief_pocket_height_z / 2.0,
-            ),
-        )
-        b.boolean_subtract(connector, pocket)
-
-    # Small cross-drilled safety-wire holes near both lug ends.
-    for wire_x, wire_z in ((fork_pin_x, 10.0), (tongue_pin_x, -10.0)):
-        wire = b.hole(
-            safety_wire_hole_diameter,
-            body_width_y + 2.0 * through_overcut,
-            position=(wire_x, body_y0 - through_overcut, wire_z),
-            direction=(0, 1, 0),
-        )
-        b.boolean_subtract(connector, wire)
-
-    # Fillets and pocket blends. Selectors are localized to avoid broad
-    # topology assumptions after multiple booleans.
-    b.fillet(
-        b.get_edges_in_box(
-            connector,
-            min_xyz=(body_x0 - 0.1, body_y0 - 0.1, body_z0 - 0.1),
-            max_xyz=(body_x1 + 0.1, body_y1 + 0.1, body_z1 + 0.1),
-        ),
-        outer_fillet,
-    )
-    for root_x in (body_x1, body_x0):
-        b.fillet(b.get_edges_near(connector, point=(root_x, 0.0, body_z1), tolerance=10.0), lug_root_fillet)
-        b.fillet(b.get_edges_near(connector, point=(root_x, 0.0, body_z0), tolerance=10.0), lug_root_fillet)
-    for pocket_x, pocket_y, pocket_z in side_pocket_centers:
-        b.fillet(b.get_edges_near(connector, point=(pocket_x, pocket_y, pocket_z), tolerance=12.0), pocket_fillet)
-
-    # Chamfers at hole openings.
-    for face_y in (body_y0, body_y1):
-        b.chamfer(b.get_edges_near(connector, point=(fork_pin_x, face_y, 0.0), tolerance=7.0), hole_chamfer)
-        b.chamfer(b.get_edges_near(connector, point=(tongue_pin_x, face_y, 0.0), tolerance=6.0), hole_chamfer)
-        for wire_x, wire_z in ((fork_pin_x, 10.0), (tongue_pin_x, -10.0)):
-            b.chamfer(b.get_edges_near(connector, point=(wire_x, face_y, wire_z), tolerance=2.0), hole_chamfer)
-    for face_z, tolerance in ((body_z1, 8.0), (body_z0, 5.0)):
-        b.chamfer(b.get_edges_near(connector, point=(0.0, 0.0, face_z), tolerance=tolerance), hole_chamfer)
 
     if output_path is None:
         output_path = os.path.splitext(os.path.abspath(__file__))[0] + ".step"
