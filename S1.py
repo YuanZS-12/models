@@ -3,7 +3,14 @@ import math
 import NXOpen
 import NXOpen.Annotations
 
-
+Line 0 : Traceback (most recent call last):
+  File "C:\Users\z004n36r\AppData\Local\Temp\Journaluxacbj0oj1qqp.py", line 298, in <module>
+    main()
+  File "C:\Users\z004n36r\AppData\Local\Temp\Journaluxacbj0oj1qqp.py", line 268, in main
+    loft_builder = work_part.Features.CreateThroughCurvesBuilder(NXOpen.Features.Feature.Null)
+                                                                 ^^^^^^^^^^^^^^^
+AttributeError: module 'NXOpen' has no attribute 'Features'
+module 'NXOpen' has no attribute 'Features'
 def naca4_contour_points(m, p, t, chord, samples=20):
     """Return a closed polyline contour for a NACA 4-digit airfoil.
 
