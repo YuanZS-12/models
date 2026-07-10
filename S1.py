@@ -3,16 +3,8 @@ import math
 import NXOpen
 import NXOpen.Annotations
 
-Line 0 : Traceback (most recent call last):
-  File "C:\Users\z004n36r\AppData\Local\Temp\Journaluxacbj0pj1qqp.py", line 298, in <module>
-    main()
-  File "C:\Users\z004n36r\AppData\Local\Temp\Journaluxacbj0pj1qqp.py", line 291, in main
-    create_pmi_span_dimension(work_part, root_face, tip_face, 120.0, view)
-  File "C:\Users\z004n36r\AppData\Local\Temp\Journaluxacbj0pj1qqp.py", line 181, in create_pmi_span_dimension
-    return builder.Commit()
-           ^^^^^^^^^^^^^^^^
-NXOpen.NXException: 'Unable to create a dimension from the selected objects and annotation plane.
-'Unable to create a dimension from the selected objects and annotation plane.
+construct a journal to create a 3D printable jet engine blade with a known airfoil. 
+Annotate the turbine with PMI measurements leaders
 
     def thickness(x):
         return (
