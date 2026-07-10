@@ -4,19 +4,15 @@ import NXOpen
 import NXOpen.Annotations
 
 Line 0 : Traceback (most recent call last):
-  File "C:\Users\z004n36r\AppData\Local\Temp\Journaluxacbj0oj1qqp.py", line 298, in <module>
+  File "C:\Users\z004n36r\AppData\Local\Temp\Journaluxacbj0pj1qqp.py", line 298, in <module>
     main()
-  File "C:\Users\z004n36r\AppData\Local\Temp\Journaluxacbj0oj1qqp.py", line 268, in main
-    loft_builder = work_part.Features.CreateThroughCurvesBuilder(NXOpen.Features.Feature.Null)
-                                                                 ^^^^^^^^^^^^^^^
-AttributeError: module 'NXOpen' has no attribute 'Features'
-module 'NXOpen' has no attribute 'Features'
-def naca4_contour_points(m, p, t, chord, samples=20):
-    """Return a closed polyline contour for a NACA 4-digit airfoil.
-
-    The point order starts at the trailing edge on the lower surface,
-    walks to the leading edge, then returns on the upper surface.
-    """
+  File "C:\Users\z004n36r\AppData\Local\Temp\Journaluxacbj0pj1qqp.py", line 291, in main
+    create_pmi_span_dimension(work_part, root_face, tip_face, 120.0, view)
+  File "C:\Users\z004n36r\AppData\Local\Temp\Journaluxacbj0pj1qqp.py", line 181, in create_pmi_span_dimension
+    return builder.Commit()
+           ^^^^^^^^^^^^^^^^
+NXOpen.NXException: 'Unable to create a dimension from the selected objects and annotation plane.
+'Unable to create a dimension from the selected objects and annotation plane.
 
     def thickness(x):
         return (
