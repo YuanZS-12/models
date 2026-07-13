@@ -8,6 +8,11 @@
 #              cadnx/
 #   2. Open NX -> File -> Execute -> NX Open -> select this file.
 #   3. NX builds the geometry and exports the STEP file next to the journal.
+#Sorry, your request failed. Please try again.
+
+Client Request Id: 46f74288-336c-4444-8150-6c6149d5b45a
+
+Reason: Request Failed: 400 {"error":{"message":"temperature is deprecated for this model.","type":"invalid_request_error","param":"","code":null}}: Error: Request Failed: 400 {"error":{"message":"temperature is deprecated for this model.","type":"invalid_request_error","param":"","code":null}} at qG._provideLanguageModelResponse (d:\software\Microsoft VS Code\4fe60c8b1c\resources\app\extensions\copilot\dist\extension.js:1690:14362) at process.processTicksAndRejections (node:internal/process/task_queues:104:5) at async qG.provideLanguageModelResponse (d:\software\Microsoft VS Code\4fe60c8b1c\resources\app\extensions\copilot\dist\extension.js:1690:15327)
 # ----------------------------------------------------------------------------
 
 import math
