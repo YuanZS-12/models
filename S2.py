@@ -10,9 +10,13 @@
 #   3. NX builds the geometry and exports the STEP file next to the journal.
 #Sorry, your request failed. Please try again.
 
-Client Request Id: 46f74288-336c-4444-8150-6c6149d5b45a
+Client Request Id: d4a6decc-0883-49d7-b90b-bea9ab9faddb
 
-Reason: Request Failed: 400 {"error":{"message":"temperature is deprecated for this model.","type":"invalid_request_error","param":"","code":null}}: Error: Request Failed: 400 {"error":{"message":"temperature is deprecated for this model.","type":"invalid_request_error","param":"","code":null}} at qG._provideLanguageModelResponse (d:\software\Microsoft VS Code\4fe60c8b1c\resources\app\extensions\copilot\dist\extension.js:1690:14362) at process.processTicksAndRejections (node:internal/process/task_queues:104:5) at async qG.provideLanguageModelResponse (d:\software\Microsoft VS Code\4fe60c8b1c\resources\app\extensions\copilot\dist\extension.js:1690:15327)
+Reason: Rate limit exceeded
+
+{"code":"upstream_provider_rate_limit","message":"{"error":{"code":"model_not_found","message":"No available channel for model Gemini 2.5 Pro under group 按量计费 (distributor) (request id: 202607130802023419407348268d9d6mOyNzzIb)","type":"new_api_error"}}"}: ChatRateLimited: Rate limit exceeded
+
+{"code":"upstream_provider_rate_limit","message":"{"error":{"code":"model_not_found","message":"No available channel for model Gemini 2.5 Pro under group 按量计费 (distributor) (request id: 202607130802023419407348268d9d6mOyNzzIb)","type":"new_api_error"}}"} at qG._provideLanguageModelResponse (d:\software\Microsoft VS Code\4fe60c8b1c\resources\app\extensions\copilot\dist\extension.js:1690:14303) at process.processTicksAndRejections (node:internal/process/task_queues:104:5) at async qG.provideLanguageModelResponse (d:\software\Microsoft VS Code\4fe60c8b1c\resources\app\extensions\copilot\dist\extension.js:1690:15327)
 # ----------------------------------------------------------------------------
 
 import math
