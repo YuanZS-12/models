@@ -1,18 +1,12 @@
 """
-NXOpen Python Journal — Precision Aircraft Flight Control Bellcrank
-Part Number: BC-AIL-135-12
-Material: 7075-T7351 aluminum forging per AMS-QQ-A-250/12
-Finish: Chem film per MIL-DTL-5541 Class 1A
-All surfaces Ra 1.6 um except bearing bores Ra 0.4 um
 Line 0 : Traceback (most recent call last):
-  File "D:\Workdir\iproot\nx2606.1700\test44\create_bellcrank_journal.py", line 983, in <module>
+  File "C:\Users\z004n36r\AppData\Local\Temp\Journalkh2zmj04yxwqp.py", line 931, in <module>
     main()
-  File "D:\Workdir\iproot\nx2606.1700\test44\create_bellcrank_journal.py", line 452, in main
-    quad_feat = extrude_b.CommitFeature()
-                ^^^^^^^^^^^^^^^^^^^^^^^^^
-NXOpen.NXException: 'Selected objects will result in a self intersecting section
-Hint: Modify or delete the invalid curve
-'Selected objects will result in a self intersecting section
+  File "C:\Users\z004n36r\AppData\Local\Temp\Journalkh2zmj04yxwqp.py", line 36, in main
+    work_part = the_session.Parts.NewDisplay(part_path, NXOpen.Part.Units.Millimeters)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+NXOpen.NXException: 'File already exists
+'File already exists
 Hint: Modify or delete the invalid curve
 """
 
