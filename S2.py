@@ -8,16 +8,12 @@
 #              cadnx/
 #   2. Open NX -> File -> Execute -> NX Open -> select this file.
 #   3. NX builds the geometry and exports the STEP file next to the journal.
-#Sorry, your request failed. Please try again.
+#orry, your request failed. Please try again.
 
-Client Request Id: d4a6decc-0883-49d7-b90b-bea9ab9faddb
+Client Request Id: f6eeeaeb-3475-4e7f-8515-4308d6962fa4
 
-Reason: Rate limit exceeded
+Reason: [401] Authentication fails due to the wrong API key. Please check your API key. If you don't have one, please create an API key first.
 
-{"code":"upstream_provider_rate_limit","message":"{"error":{"code":"model_not_found","message":"No available channel for model Gemini 2.5 Pro under group 按量计费 (distributor) (request id: 202607130802023419407348268d9d6mOyNzzIb)","type":"new_api_error"}}"}: ChatRateLimited: Rate limit exceeded
-
-{"code":"upstream_provider_rate_limit","message":"{"error":{"code":"model_not_found","message":"No available channel for model Gemini 2.5 Pro under group 按量计费 (distributor) (request id: 202607130802023419407348268d9d6mOyNzzIb)","type":"new_api_error"}}"} at qG._provideLanguageModelResponse (d:\software\Microsoft VS Code\4fe60c8b1c\resources\app\extensions\copilot\dist\extension.js:1690:14303) at process.processTicksAndRejections (node:internal/process/task_queues:104:5) at async qG.provideLanguageModelResponse (d:\software\Microsoft VS Code\4fe60c8b1c\resources\app\extensions\copilot\dist\extension.js:1690:15327)
-# ----------------------------------------------------------------------------
 
 import math
 import os
