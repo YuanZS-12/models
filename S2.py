@@ -1,12 +1,15 @@
 """
 Line 0 : Traceback (most recent call last):
-  File "D:\Workdir\iproot\nx2606.1700\test44\create_bellcrank_journal.py", line 936, in <module>
+  File "C:\Users\z004n36r\AppData\Local\Temp\Journal4c0h3i0mr_wqp.py", line 938, in <module>
     main()
-  File "D:\Workdir\iproot\nx2606.1700\test44\create_bellcrank_journal.py", line 550, in main
-    cable_hole_feat = hfb2.CommitFeature()
-                      ^^^^^^^^^^^^^^^^^^^^
-NXOpen.NXException: 'Tool body completely outside target body.
-'Tool body completely outside target body.
+  File "C:\Users\z004n36r\AppData\Local\Temp\Journal4c0h3i0mr_wqp.py", line 409, in main
+    quad_feat = extrude_b.CommitFeature()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+NXOpen.NXException: 'Solid tool body is required for current Boolean option.
+Change the body type to solid or change the Boolean option to None.
+
+'Solid tool body is required for current Boolean option.
+Change the body type to solid or change the Boolean option to None.
 
 """
 
