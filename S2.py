@@ -1,16 +1,16 @@
 """
 Line 0 : Traceback (most recent call last):
-  File "C:\Users\z004n36r\AppData\Local\Temp\Journal4c0h3i0mr_wqp.py", line 938, in <module>
+  File "C:\Users\z004n36r\AppData\Local\Temp\Journal4c0h3i0nr_wqp.py", line 933, in <module>
     main()
-  File "C:\Users\z004n36r\AppData\Local\Temp\Journal4c0h3i0mr_wqp.py", line 409, in main
-    quad_feat = extrude_b.CommitFeature()
-                ^^^^^^^^^^^^^^^^^^^^^^^^^
-NXOpen.NXException: 'Solid tool body is required for current Boolean option.
-Change the body type to solid or change the Boolean option to None.
-
-'Solid tool body is required for current Boolean option.
-Change the body type to solid or change the Boolean option to None.
-
+  File "C:\Users\z004n36r\AppData\Local\Temp\Journal4c0h3i0nr_wqp.py", line 405, in main
+    sects = [create_closed_section(work_part, quad_section_curves)]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\z004n36r\AppData\Local\Temp\Journal4c0h3i0nr_wqp.py", line 30, in create_closed_section
+    curve.StartPoint,
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'NXOpen.Arc' object has no attribute 'StartPoint'
+'NXOpen.Arc' object has no attribute 'StartPoint'
+  
 """
 
 import math
