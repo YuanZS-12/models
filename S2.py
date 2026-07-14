@@ -1,13 +1,13 @@
 """
 Line 0 : Traceback (most recent call last):
-  File "C:\Users\z004n36r\AppData\Local\Temp\Journalkh2zmj04yxwqp.py", line 931, in <module>
+  File "C:\Users\z004n36r\AppData\Local\Temp\Journalkh2zmj07yxwqp.py", line 929, in <module>
     main()
-  File "C:\Users\z004n36r\AppData\Local\Temp\Journalkh2zmj04yxwqp.py", line 36, in main
-    work_part = the_session.Parts.NewDisplay(part_path, NXOpen.Part.Units.Millimeters)
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-NXOpen.NXException: 'File already exists
-'File already exists
-Hint: Modify or delete the invalid curve
+  File "C:\Users\z004n36r\AppData\Local\Temp\Journalkh2zmj07yxwqp.py", line 543, in main
+    cable_hole_feat = hfb2.CommitFeature()
+                      ^^^^^^^^^^^^^^^^^^^^
+NXOpen.NXException: 'Tool body completely outside target body.
+'Tool body completely outside target body.
+
 """
 
 import math
