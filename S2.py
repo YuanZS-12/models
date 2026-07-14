@@ -1,9 +1,12 @@
 """
-NXOpen Python Journal — Precision Aircraft Flight Control Bellcrank
-Part Number: BC-AIL-135-12
-Material: 7075-T7351 aluminum forging per AMS-QQ-A-250/12
-Finish: Chem film per MIL-DTL-5541 Class 1A
-All surfaces Ra 1.6 um except bearing bores Ra 0.4 um
+Line 0 : Traceback (most recent call last):
+  File "D:\Workdir\iproot\nx2606.1700\test44\create_bellcrank_journal.py", line 936, in <module>
+    main()
+  File "D:\Workdir\iproot\nx2606.1700\test44\create_bellcrank_journal.py", line 550, in main
+    cable_hole_feat = hfb2.CommitFeature()
+                      ^^^^^^^^^^^^^^^^^^^^
+NXOpen.NXException: 'Tool body completely outside target body.
+'Tool body completely outside target body.
 
 """
 
