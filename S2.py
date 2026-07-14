@@ -1,8 +1,8 @@
 """
 Line 0 : Traceback (most recent call last):
-  File "C:\Users\z004n36r\AppData\Local\Temp\Journal4c0h3i0qr_wqp.py", line 964, in <module>
+  File "C:\Users\z004n36r\AppData\Local\Temp\Journal4c0h3i0rr_wqp.py", line 963, in <module>
     main()
-  File "C:\Users\z004n36r\AppData\Local\Temp\Journal4c0h3i0qr_wqp.py", line 862, in main
+  File "C:\Users\z004n36r\AppData\Local\Temp\Journal4c0h3i0rr_wqp.py", line 861, in main
     hfb_m3.SetSimpleHole(NXOpen.Point3d(sx, sy, 14.0), False, screw_face, "3")
 NXOpen.NXException: 'No planar face selected.
 'No planar face selected.
