@@ -1,12 +1,9 @@
 """
-Line 0 : Traceback (most recent call last):
-  File "C:\Users\z004n36r\AppData\Local\Temp\Journalkh2zmj07yxwqp.py", line 929, in <module>
-    main()
-  File "C:\Users\z004n36r\AppData\Local\Temp\Journalkh2zmj07yxwqp.py", line 543, in main
-    cable_hole_feat = hfb2.CommitFeature()
-                      ^^^^^^^^^^^^^^^^^^^^
-NXOpen.NXException: 'Tool body completely outside target body.
-'Tool body completely outside target body.
+NXOpen Python Journal — Precision Aircraft Flight Control Bellcrank
+Part Number: BC-AIL-135-12
+Material: 7075-T7351 aluminum forging per AMS-QQ-A-250/12
+Finish: Chem film per MIL-DTL-5541 Class 1A
+All surfaces Ra 1.6 um except bearing bores Ra 0.4 um
 
 """
 
@@ -17,6 +14,9 @@ import NXOpen
 import NXOpen.Features
 import NXOpen.Annotations
 import NXOpen.GeometricUtilities
+
+RAW_NXOPEN_HIGH_FIDELITY = True
+STATIC_ONLY_NXOPEN_REVIEW = True
 
 
 def main():
@@ -30,9 +30,12 @@ def main():
     work_dir = os.path.join(script_dir, "_cadnx_work")
     os.makedirs(work_dir, exist_ok=True)
 
-    part_path = os.path.join(work_dir, "BC-AIL-135-12.prt")
-    if os.path.exists(part_path):
-        os.remove(part_path)
+    # NX may keep a part name registered in the current session even after its
+    # file is deleted. Use a unique output name for every journal run so
+    # NewDisplay never collides with an open or previously loaded part.
+    run_id = time.strftime("%Y%m%d_%H%M%S") + f"_{int(time.time() * 1000) % 1000:03d}"
+    output_stem = f"BC-AIL-135-12_{run_id}"
+    part_path = os.path.join(work_dir, output_stem + ".prt")
 
     work_part = the_session.Parts.NewDisplay(part_path, NXOpen.Part.Units.Millimeters)
     print(f"Created part: {work_part.Leaf}")
@@ -193,6 +196,7 @@ def main():
         NXOpen.Point3d(ex_end, ey_end, 0.0),
     )
     sketch.AddGeometry(line_end, NXOpen.Sketch.InferConstraintsOption.InferNoConstraints)
+    quad_section_curves = [outer_arc, line_end, inner_arc, line_start]
 
     # --- 6b. Pushrod attachment lug at 135 degrees from +X, R52 ---
     lug_angle = math.radians(135.0)
@@ -223,17 +227,23 @@ def main():
 
     # Four corners of the lug rectangle
     lug_corners = []
-    for dl in [-lug_half_len, lug_half_len]:
-        for dw in [-lug_half_wid, lug_half_wid]:
-            px = lcx + dl * cos_a + dw * cos_a_perp
-            py = lcy + dl * sin_a + dw * sin_a_perp
-            lug_corners.append(NXOpen.Point3d(px, py, 0.0))
+    for dl, dw in [
+        (-lug_half_len, -lug_half_wid),
+        (lug_half_len, -lug_half_wid),
+        (lug_half_len, lug_half_wid),
+        (-lug_half_len, lug_half_wid),
+    ]:
+        px = lcx + dl * cos_a + dw * cos_a_perp
+        py = lcy + dl * sin_a + dw * sin_a_perp
+        lug_corners.append(NXOpen.Point3d(px, py, 0.0))
 
     # Create lug outline
+    lug_profile = []
     for i in range(4):
         j = (i + 1) % 4
         line = work_part.Curves.CreateLine(lug_corners[i], lug_corners[j])
         sketch.AddGeometry(line, NXOpen.Sketch.InferConstraintsOption.InferNoConstraints)
+        lug_profile.append(line)
 
     # --- 6c. Secondary tab drive arm at 225 degrees, R28 ---
     tab_angle = math.radians(225.0)
@@ -253,16 +263,22 @@ def main():
     sin_t_perp = math.sin(tab_angle + math.pi / 2)
 
     tab_corners = []
-    for dl in [-tab_half_len, tab_half_len]:
-        for dw in [-tab_half_wid, tab_half_wid]:
-            px = tcx + dl * cos_t + dw * cos_t_perp
-            py = tcy + dl * sin_t + dw * sin_t_perp
-            tab_corners.append(NXOpen.Point3d(px, py, 0.0))
+    for dl, dw in [
+        (-tab_half_len, -tab_half_wid),
+        (tab_half_len, -tab_half_wid),
+        (tab_half_len, tab_half_wid),
+        (-tab_half_len, tab_half_wid),
+    ]:
+        px = tcx + dl * cos_t + dw * cos_t_perp
+        py = tcy + dl * sin_t + dw * sin_t_perp
+        tab_corners.append(NXOpen.Point3d(px, py, 0.0))
 
+    tab_profile = []
     for i in range(4):
         j = (i + 1) % 4
         line = work_part.Curves.CreateLine(tab_corners[i], tab_corners[j])
         sketch.AddGeometry(line, NXOpen.Sketch.InferConstraintsOption.InferNoConstraints)
+        tab_profile.append(line)
 
     # --- 6d. Cable attachment circle at R68, 42.5 degrees ---
     cable_hole_angle = math.radians(42.5)
@@ -305,16 +321,22 @@ def main():
     sin_bw_perp = math.sin(bw_angle + math.pi / 2)
 
     bw_corners = []
-    for dl in [-bw_half_len, bw_half_len]:
-        for dw in [-bw_half_wid, bw_half_wid]:
-            px = bwx + dl * cos_bw + dw * cos_bw_perp
-            py = bwy + dl * sin_bw + dw * sin_bw_perp
-            bw_corners.append(NXOpen.Point3d(px, py, 0.0))
+    for dl, dw in [
+        (-bw_half_len, -bw_half_wid),
+        (bw_half_len, -bw_half_wid),
+        (bw_half_len, bw_half_wid),
+        (-bw_half_len, bw_half_wid),
+    ]:
+        px = bwx + dl * cos_bw + dw * cos_bw_perp
+        py = bwy + dl * sin_bw + dw * sin_bw_perp
+        bw_corners.append(NXOpen.Point3d(px, py, 0.0))
 
+    bw_profile = []
     for i in range(4):
         j = (i + 1) % 4
         line = work_part.Curves.CreateLine(bw_corners[i], bw_corners[j])
         sketch.AddGeometry(line, NXOpen.Sketch.InferConstraintsOption.InferNoConstraints)
+        bw_profile.append(line)
 
     # --- 6g. Stop pads: 10mm diameter circles ---
     # Downstop at R55, 175 degrees
@@ -336,6 +358,7 @@ def main():
         NXOpen.Point3d(s2x, s2y, 0.0), nx_mat, 5.0, 0.0, 2.0 * math.pi
     )
     sketch.AddGeometry(stop2, NXOpen.Sketch.InferConstraintsOption.InferNoConstraints)
+    stop_pad_arcs = [stop1, stop2]
 
     sketch.Deactivate(
         NXOpen.Sketch.ViewReorient.FalseValue, NXOpen.Sketch.UpdateLevel.Model
@@ -346,9 +369,6 @@ def main():
     # 7. EXTRUDE sketch profiles to create solid bodies
     # ------------------------------------------------------------------
     # Create sections from sketch curves and extrude them
-
-    # Get all sketch geometry
-    all_geom = sketch.GetAllGeometry()
 
     # We need to create separate extrusions:
     # A) Quadrant arm outer profile (outer arc + inner arc + radial lines)
@@ -362,76 +382,6 @@ def main():
 
     # For simplicity, create one extrusion from the quadrant arm profile
     # and one from the pushrod lug, one from tab arm
-
-    # Collect curves by type/region
-    arcs = [g for g in all_geom if isinstance(g, NXOpen.Arc)]
-    lines = [g for g in all_geom if isinstance(g, NXOpen.Line)]
-
-    # Separate arcs by radius to identify features
-    quadrant_arcs = []
-    lug_lines = []
-    tab_lines = []
-    bw_lines = []
-    circle_arcs = []
-
-    for a in arcs:
-        r = round(a.Radius, 1)
-        if abs(r - 75.0) < 0.1 or abs(r - 65.0) < 0.1:
-            quadrant_arcs.append(a)
-        elif abs(r - 5.0) < 0.1:
-            circle_arcs.append(a)
-        elif abs(r - 7.0) < 0.1:
-            circle_arcs.append(a)
-        elif abs(r - 4.0) < 0.1:
-            circle_arcs.append(a)
-        else:
-            circle_arcs.append(a)
-
-    # For the quadrant arm profile, we need the two arcs and two radial lines
-    # Identify radial lines (start/end closing lines)
-    radial_lines = []
-    for line in lines:
-        p1 = line.StartPoint
-        p2 = line.EndPoint
-        # Check if line is radial (one endpoint near origin)
-        d1 = math.sqrt(p1.X ** 2 + p1.Y ** 2)
-        d2 = math.sqrt(p2.X ** 2 + p2.Y ** 2)
-        if d1 < 1.0 or d2 < 1.0:
-            continue  # skip lines near origin
-        # Radial lines connect two concentric arcs
-        radial_lines.append(line)
-
-    # Combine quadrant arm curves
-    quad_section_curves = quadrant_arcs + radial_lines
-
-    # For pushrod lug, tab arm, BW pocket - use lines
-    # Identify which lines belong to which feature by position
-    lug_center_x = lug_r * math.cos(lug_angle)
-    lug_center_y = lug_r * math.sin(lug_angle)
-    tab_center_x = tab_r * math.cos(tab_angle)
-    tab_center_y = tab_r * math.sin(tab_angle)
-    bw_center_x = bw_r * math.cos(bw_angle)
-    bw_center_y = bw_r * math.sin(bw_angle)
-
-    lug_profile = []
-    tab_profile = []
-    bw_profile = []
-
-    for line in lines:
-        mid_x = (line.StartPoint.X + line.EndPoint.X) / 2.0
-        mid_y = (line.StartPoint.Y + line.EndPoint.Y) / 2.0
-
-        # Check proximity to feature centers
-        d_lug = math.sqrt((mid_x - lug_center_x) ** 2 + (mid_y - lug_center_y) ** 2)
-        d_tab = math.sqrt((mid_x - tab_center_x) ** 2 + (mid_y - tab_center_y) ** 2)
-        d_bw = math.sqrt((mid_x - bw_center_x) ** 2 + (mid_y - bw_center_y) ** 2)
-
-        if d_lug < 20.0:
-            lug_profile.append(line)
-        elif d_tab < 15.0:
-            tab_profile.append(line)
-        elif d_bw < 15.0:
-            bw_profile.append(line)
 
     # --- 7a. Extrude quadrant arm (12 mm thick) ---
     if quad_section_curves:
@@ -454,6 +404,8 @@ def main():
             extrude_b.BooleanOperation.Type = NXOpen.GeometricUtilities.BooleanOperation.BooleanType.Unite
             extrude_b.BooleanOperation.SetTargetBodies([main_body])
             quad_feat = extrude_b.CommitFeature()
+            quad_bodies = quad_feat.GetBodies()
+            quadrant_body = quad_bodies[0] if quad_bodies else main_body
             extrude_b.Destroy()
             print("Quadrant arm extruded")
 
@@ -506,7 +458,7 @@ def main():
             print("Tab drive arm extruded")
 
     # --- 7d. Extrude stop pads (4 mm height) ---
-    for stop_circle in circle_arcs:
+    for stop_circle in stop_pad_arcs:
         sects = work_part.Sections.CreateSectionsUsingCurves(
             [stop_circle],
             NXOpen.SectionCollection.LoopOption.Separate,
@@ -557,12 +509,11 @@ def main():
     # --- 7f. Create cable attachment hole (8mm) ---
     # Use hole feature
     # First find the top face of quadrant arm
-    bodies_after = list(work_part.Bodies)
-    current_body = bodies_after[-1]  # The main united body
+    current_body = main_body
 
     # Find appropriate face for cable hole
     top_face_quad = None
-    for f in current_body.GetFaces():
+    for f in quadrant_body.GetFaces():
         try:
             for e in f.GetEdges():
                 for v in e.GetVertices():
@@ -575,12 +526,12 @@ def main():
             continue
 
     if top_face_quad is None:
-        # Try with z=14 area (block top)
-        for f in current_body.GetFaces():
+        # Fall back to another face on the quadrant body, never the main block.
+        for f in quadrant_body.GetFaces():
             try:
                 for e in f.GetEdges():
                     for v in e.GetVertices():
-                        if abs(v.Z - 14.0) < 0.5:
+                        if abs(v.Z - 6.0) < 0.5:
                             top_face_quad = f
                             break
                     if top_face_quad:
@@ -589,13 +540,13 @@ def main():
                 continue
 
     if top_face_quad is None:
-        top_face_quad = current_body.GetFaces()[0]
+        top_face_quad = quadrant_body.GetFaces()[0]
 
     # Create cable attachment hole (8mm)
     hfb2 = work_part.Features.CreateHoleFeatureBuilder(None)
     hfb2.SetSimpleHole(NXOpen.Point3d(chx, chy, 6.0), False, top_face_quad, "8")
     hfb2.SetDepth("12")
-    hfb2.SetTargetBody(current_body)
+    hfb2.SetTargetBody(quadrant_body)
     cable_hole_feat = hfb2.CommitFeature()
     hfb2.Destroy()
     print("Cable attachment hole created")
@@ -952,9 +903,7 @@ def main():
     # ------------------------------------------------------------------
     # 18. EXPORT AS STEP
     # ------------------------------------------------------------------
-    step_path = os.path.join(work_dir, "BC-AIL-135-12.stp")
-    if os.path.exists(step_path):
-        os.remove(step_path)
+    step_path = os.path.join(work_dir, output_stem + ".stp")
 
     try:
         creator = the_session.DexManager.CreateStepCreator()
