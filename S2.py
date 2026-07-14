@@ -1,15 +1,14 @@
 """
 Line 0 : Traceback (most recent call last):
-  File "C:\Users\z004n36r\AppData\Local\Temp\Journal4c0h3i0nr_wqp.py", line 933, in <module>
+  File "C:\Users\z004n36r\AppData\Local\Temp\Journal4c0h3i0or_wqp.py", line 945, in <module>
     main()
-  File "C:\Users\z004n36r\AppData\Local\Temp\Journal4c0h3i0nr_wqp.py", line 405, in main
-    sects = [create_closed_section(work_part, quad_section_curves)]
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\z004n36r\AppData\Local\Temp\Journal4c0h3i0nr_wqp.py", line 30, in create_closed_section
-    curve.StartPoint,
-    ^^^^^^^^^^^^^^^^
-AttributeError: 'NXOpen.Arc' object has no attribute 'StartPoint'
-'NXOpen.Arc' object has no attribute 'StartPoint'
+  File "C:\Users\z004n36r\AppData\Local\Temp\Journal4c0h3i0or_wqp.py", line 431, in main
+    quad_feat = extrude_b.CommitFeature()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+NXOpen.NXException: 'Selected objects will result in a self intersecting section
+Hint: Modify or delete the invalid curve
+'Selected objects will result in a self intersecting section
+Hint: Modify or delete the invalid curve
   
 """
 
