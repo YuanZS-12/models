@@ -192,5 +192,22 @@ arm1 = build_curved_arm(wp,
 File "D:\Workdir\iproot\nx2606.1700\test44\aircraft_curved_bellcrank.py", line 342, in build_curved_arm
 feat = swb.CommitFeature()
 ^^^^^^^^^^^^^^^^^^^
+The SweptBuilder section strings are consistently failing. Let me switch to a proven strategy — use **ThroughCurvesBuilder (loft)** through multiple cross-sections along the spline, which has been reliable in the earlier working journals:
+
+
+
+Read [](file:///d%3A/Workdir/iproot/nx2606.1700/test44/aircraft_curved_bellcrank.py#240-240), lines 240 to 270
+
+Read [](file:///d%3A/Workdir/iproot/nx2606.1700/test44/aircraft_curved_bellcrank.py#270-270), lines 270 to 365
+
+
+
+
+```
+
+```
+The arms are now built via **ThroughCurves loft** through 5 cross-sections instead of the problematic SweptBuilder. Each of the 5 sections has its own width, thickness, and twist interpolated along the Bezier path — the ThroughCurves loft smoothly morphs between them. This approach matches the proven pattern from naca_comprssor.py.
+
+Made changes.
 NXOpen.NXException: 'Invalid section string definition.
 'Invalid section string definition.
