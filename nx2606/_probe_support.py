@@ -6,6 +6,7 @@ user manually executes them inside NX.
 
 import json
 import os
+import time
 
 import NXOpen
 import NXOpen.Features
@@ -132,18 +133,24 @@ def export_step(session, work_part, output_path):
             creator.ExportFrom = NXOpen.StepCreator.ExportFromOption.DisplayPart
             creator.FileSaveFlag = False
             creator.ProcessHoldFlag = True
+            # The DisplayPart-only NX 2606 rerun saved the native PRT but
+            # produced no STEP. Retest the original InputFile combination with
+            # a unique per-run output so no stale file can mask the result.
+            creator.InputFile = work_part.FullPath
         elif hasattr(dex_manager, "CreateStep214Creator"):
             creator = dex_manager.CreateStep214Creator()
         else:
             raise RuntimeError("NX DexManager exposes neither CreateStepCreator nor CreateStep214Creator")
-        # DisplayPart export operates on the live display part. Setting
-        # InputFile at the same time can make NX translate only the saved file
-        # envelope and produce an AP242 file with no solid representation.
         creator.OutputFile = output_path
         creator.Commit()
     finally:
         if creator is not None:
             creator.Destroy()
-    if not os.path.isfile(output_path) or os.path.getsize(output_path) <= 0:
-        raise RuntimeError("STEP export did not create a non-empty file: " + output_path)
-    return output_path
+    deadline = time.time() + 60.0
+    while time.time() < deadline:
+        if os.path.isfile(output_path) and os.path.getsize(output_path) > 0:
+            return output_path
+        time.sleep(0.25)
+    raise RuntimeError(
+        "STEP export did not create a non-empty file within 60 seconds: " + output_path
+    )
