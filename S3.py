@@ -1,21 +1,15 @@
 """
 Line 0 : Traceback (most recent call last):
-  File "D:\Workdir\iproot\nx2606.1700\test44\naca_comprssor.py", line 427, in <module>
+  File "C:\Users\z004n36r\AppData\Local\Temp\Journaltp7cv80p7nyqp.py", line 427, in <module>
     main()
-  File "D:\Workdir\iproot\nx2606.1700\test44\naca_comprssor.py", line 411, in main
-    shell = build_primary_blade(work_part)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "D:\Workdir\iproot\nx2606.1700\test44\naca_comprssor.py", line 261, in build_primary_blade
-    shell = subtract(work_part, shell, inner)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "D:\Workdir\iproot\nx2606.1700\test44\naca_comprssor.py", line 208, in subtract
-    return boolean(work_part, target, tool, NXOpen.Features.Feature.BooleanType.Subtract)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "D:\Workdir\iproot\nx2606.1700\test44\naca_comprssor.py", line 190, in boolean
-    builder = work_part.Features.CreateBooleanBuilder(NXOpen.Features.Feature.Null)
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-TypeError: 'First parameter is invalid. 'Expecting NXOpen.Features.BooleanFeature type, found NXOpen.Features.Feature.
-'First parameter is invalid. 'Expecting NXOpen.Features.BooleanFeature type, found NXOpen.Features.Feature.
+  File "C:\Users\z004n36r\AppData\Local\Temp\Journaltp7cv80p7nyqp.py", line 423, in main
+    save_and_export(session, work_part, output_path)
+  File "C:\Users\z004n36r\AppData\Local\Temp\Journaltp7cv80p7nyqp.py", line 381, in save_and_export
+    save_components = getattr(NXOpen.BasePart.SaveComponents, "True")
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'NXOpen.BasePartSaveComponents' has no attribute 'True'
+type object 'NXOpen.BasePartSaveComponents' has no attribute 'True'
+
 """
 
 import math
