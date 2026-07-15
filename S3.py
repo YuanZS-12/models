@@ -1,14 +1,35 @@
 """
-Line 0 : Traceback (most recent call last):
-  File "C:\Users\z004n36r\AppData\Local\Temp\Journaltp7cv80p7nyqp.py", line 427, in <module>
-    main()
-  File "C:\Users\z004n36r\AppData\Local\Temp\Journaltp7cv80p7nyqp.py", line 423, in main
-    save_and_export(session, work_part, output_path)
-  File "C:\Users\z004n36r\AppData\Local\Temp\Journaltp7cv80p7nyqp.py", line 381, in save_and_export
-    save_components = getattr(NXOpen.BasePart.SaveComponents, "True")
-                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-AttributeError: type object 'NXOpen.BasePartSaveComponents' has no attribute 'True'
-type object 'NXOpen.BasePartSaveComponents' has no attribute 'True'
+Create a single solid aircraft flight-control bellcrank STEP model in millimeters.
+
+The bellcrank lies primarily in the XY plane and is symmetric about its 12 mm thickness in Z. Center the part thickness about Z = 0, so its bottom is at Z = -6 mm and its top is at Z = 6 mm.
+
+Create a central circular pivot hub 50 mm in diameter and 12 mm thick, centered at X = 0 and Y = 0.
+
+Add a central vertical through-bore 20 mm in diameter through the pivot hub. Add a concentric bearing seat on the top face, 32 mm in diameter and 4 mm deep. Add an identical concentric bearing seat on the bottom face, 32 mm in diameter and 4 mm deep. The remaining central web around the bore must stay continuous.
+
+Create a first control arm extending from the central hub toward positive X. The center of its end boss is located at X = 85 mm and Y = 0. The arm should taper smoothly from 34 mm wide where it joins the central hub to 24 mm wide near the end boss. Keep the main arm web 8 mm thick and centered about Z = 0.
+
+Create a circular end boss at X = 85 mm and Y = 0. The boss is 34 mm in diameter and 12 mm thick. Add a vertical through-hole 10 mm in diameter through the center of this boss.
+
+Create a second control arm extending from the central hub toward positive Y. The center of its end boss is located at X = 0 and Y = 70 mm. The arm should taper smoothly from 32 mm wide where it joins the central hub to 22 mm wide near the end boss. Keep this arm web 8 mm thick and centered about Z = 0.
+
+Create a circular end boss at X = 0 and Y = 70 mm. The boss is 32 mm in diameter and 12 mm thick. Add a vertical through-hole 8 mm in diameter through the center of this boss.
+
+Add raised reinforcement pads on the top and bottom surfaces around the central pivot hub and both end bosses. Each reinforcement pad should blend into its corresponding arm. Keep the total finished thickness at each hub or boss equal to 12 mm and the arm web thickness equal to 8 mm.
+
+Add one circular lightening hole, 16 mm in diameter, through the positive-X arm. Locate it at X = 52 mm and Y = 0.
+
+Add one circular lightening hole, 14 mm in diameter, through the positive-Y arm. Locate it at X = 0 and Y = 42 mm.
+
+Maintain at least 4 mm of material between every lightening hole and the nearest outside edge. Maintain at least 5 mm of radial material around each pivot or attachment bore.
+
+Add 4 mm fillets at the transitions between both arms and the central hub. Add 3 mm fillets where each arm joins its end boss. Add 1 mm fillets to the remaining exposed outside edges where geometrically safe.
+
+Add 0.8 mm chamfers to the top and bottom edges of the central bore and both attachment holes. Do not chamfer the bearing-seat shoulders.
+
+The finished model must be one continuous, closed, positive-volume solid. All arm-to-hub and arm-to-boss connections must have real volume overlap and must not rely on tangent or face-only contact.
+
+Export the native Siemens NX part as an aircraft_control_bellcrank.prt file and export an aircraft_control_bellcrank.step file next to it.
 
 """
 
