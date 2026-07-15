@@ -1,8 +1,21 @@
-"""NXOpen journal: NACA 4412 twisted HAWT blade root section.
-
-Run inside Siemens NX (File -> Execute -> NX Open).  The journal creates one
-NX part containing the blade shell and requested integral/embedded geometry,
-saves a native PRT, and exports an AP214/AP242-compatible STEP beside itself.
+"""
+Line 0 : Traceback (most recent call last):
+  File "D:\Workdir\iproot\nx2606.1700\test44\naca_comprssor.py", line 427, in <module>
+    main()
+  File "D:\Workdir\iproot\nx2606.1700\test44\naca_comprssor.py", line 411, in main
+    shell = build_primary_blade(work_part)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Workdir\iproot\nx2606.1700\test44\naca_comprssor.py", line 261, in build_primary_blade
+    shell = subtract(work_part, shell, inner)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Workdir\iproot\nx2606.1700\test44\naca_comprssor.py", line 208, in subtract
+    return boolean(work_part, target, tool, NXOpen.Features.Feature.BooleanType.Subtract)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Workdir\iproot\nx2606.1700\test44\naca_comprssor.py", line 190, in boolean
+    builder = work_part.Features.CreateBooleanBuilder(NXOpen.Features.Feature.Null)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'First parameter is invalid. 'Expecting NXOpen.Features.BooleanFeature type, found NXOpen.Features.Feature.
+'First parameter is invalid. 'Expecting NXOpen.Features.BooleanFeature type, found NXOpen.Features.Feature.
 """
 
 import math
