@@ -119,8 +119,7 @@ def unite(work_part, target_feature, tool_feature):
         builder.Destroy()
 
 
-def _section_from_curves(work_part, curves, help_points):
-    section = work_part.Sections.CreateSection(0.01, 0.0095, 0.5)
+def add_curves_to_section(work_part, section, curves, help_points):
     section.SetAllowedEntityTypes(NXOpen.Section.AllowTypes.OnlyCurves)
     options = work_part.ScRuleFactory.CreateRuleOptions()
     try:
@@ -138,6 +137,11 @@ def _section_from_curves(work_part, curves, help_points):
     finally:
         options.Dispose()
     return section
+
+
+def _section_from_curves(work_part, curves, help_points):
+    section = work_part.Sections.CreateSection(0.01, 0.0095, 0.5)
+    return add_curves_to_section(work_part, section, curves, help_points)
 
 
 def closed_polygon_section(work_part, points):
@@ -188,6 +192,11 @@ def closed_rotated_rectangle_section(
 def line_section(work_part, start, end):
     curve = work_part.Curves.CreateLine(start, end)
     return _section_from_curves(work_part, [curve], [start])
+
+
+def add_line_to_section(work_part, section, start, end):
+    curve = work_part.Curves.CreateLine(start, end)
+    return add_curves_to_section(work_part, section, [curve], [start])
 
 
 def export_step(session, work_part, output_path):

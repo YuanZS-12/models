@@ -5,6 +5,7 @@ import NXOpen.Features
 import NXOpen.GeometricUtilities
 
 from _probe_support import (
+    add_line_to_section,
     closed_rectangle_section,
     closed_rotated_rectangle_section,
     line_section,
@@ -46,7 +47,17 @@ def operation(session, work_part, report):
         builder.BodyPreference.BodyType = NXOpen.GeometricUtilities.FeatureOptions.BodyStyle.Solid
         builder.SectionList.Append([root, tip])
         builder.GuideList.Append(guide)
+        # ByAngularLaw requires an explicit spine in addition to the guide.
+        # Populate the builder-owned Spine section and bind the law to it using
+        # the official LawBuilder.SetSpineIntoBuilder contract.
+        add_line_to_section(
+            work_part,
+            builder.Spine,
+            NXOpen.Point3d(10.0, 5.0, 0.0),
+            NXOpen.Point3d(10.0, 5.0, 40.0),
+        )
         angular_law = builder.OrientationMethod.AngularLaw
+        angular_law.SetSpineIntoBuilder(builder.Spine)
         angular_law.LawType = NXOpen.GeometricUtilities.LawBuilder.Type.Linear
         angular_law.StartValue.RightHandSide = "0"
         angular_law.EndValue.RightHandSide = "20"
@@ -60,6 +71,7 @@ def operation(session, work_part, report):
     report["api_generation"] = "SweptBuilder1"
     report["angular_law_degrees"] = [0.0, 20.0]
     report["section_count"] = 2
+    report["angular_law_spine"] = True
 
 
 def main():

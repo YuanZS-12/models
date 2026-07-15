@@ -22,9 +22,9 @@ Current probes:
 | `02_closed_polyline_section.py` | closed Section and curve rules | verified by manual NX 2606 run |
 | `03_closed_spline_section.py` | periodic StudioSplineBuilderEx curve | verified by manual NX 2606 run |
 | `04_through_curves_solid.py` | two-section solid loft | verified by manual NX 2606 run |
-| `05_sweep_fixed_orientation.py` | SweptBuilder1 two identical sections + fixed-orientation solid | repaired after one-section guide-approximation failure; manual rerun required |
+| `05_sweep_fixed_orientation.py` | SweptBuilder1 two identical sections + fixed-orientation solid | verified by manual NX 2606 run |
 | `06_sweep_two_sections.py` | SweptBuilder1 two-section tapered solid | verified by manual NX 2606 run |
-| `07_sweep_angular_law.py` | SweptBuilder1 two corresponding sections + linear angular-law solid | repaired after one-section guide-approximation failure; manual rerun required |
+| `07_sweep_angular_law.py` | SweptBuilder1 two corresponding sections + explicit spine + linear angular-law solid | experimental; repaired after invalid-orientation failure and requires manual rerun |
 | `08_boolean_unite.py` | overlapping-body boolean unite | verified by manual NX 2606 run |
 | `09_edge_blend.py` | collector + AddChainset edge blend | verified by manual NX 2606 run |
 | `10_step_ap242.py` | generic StepCreator native save and solid STEP export | rejected configuration; current output remains metadata-only with `ObjectTypes.Solids=True` |
