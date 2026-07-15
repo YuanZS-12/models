@@ -5,6 +5,7 @@ user manually executes them inside NX.
 """
 
 import json
+import math
 import os
 import time
 
@@ -139,18 +140,49 @@ def _section_from_curves(work_part, curves, help_points):
     return section
 
 
-def closed_rectangle_section(work_part, z_value, half_width, half_height):
-    points = [
-        NXOpen.Point3d(-half_width, -half_height, z_value),
-        NXOpen.Point3d(half_width, -half_height, z_value),
-        NXOpen.Point3d(half_width, half_height, z_value),
-        NXOpen.Point3d(-half_width, half_height, z_value),
-    ]
+def closed_polygon_section(work_part, points):
     curves = [
         work_part.Curves.CreateLine(point, points[(index + 1) % len(points)])
         for index, point in enumerate(points)
     ]
     return _section_from_curves(work_part, curves, points)
+
+
+def closed_rectangle_section(work_part, z_value, half_width, half_height):
+    return closed_polygon_section(
+        work_part,
+        [
+            NXOpen.Point3d(-half_width, -half_height, z_value),
+            NXOpen.Point3d(half_width, -half_height, z_value),
+            NXOpen.Point3d(half_width, half_height, z_value),
+            NXOpen.Point3d(-half_width, half_height, z_value),
+        ],
+    )
+
+
+def closed_rotated_rectangle_section(
+    work_part, z_value, half_width, half_height, pivot_x, pivot_y, angle_degrees
+):
+    angle = math.radians(angle_degrees)
+    cosine = math.cos(angle)
+    sine = math.sin(angle)
+    points = []
+    for x_value, y_value in (
+        (-half_width, -half_height),
+        (half_width, -half_height),
+        (half_width, half_height),
+        (-half_width, half_height),
+    ):
+        delta_x = x_value - pivot_x
+        delta_y = y_value - pivot_y
+        points.append(
+            NXOpen.Point3d(
+                pivot_x + delta_x * cosine - delta_y * sine,
+                pivot_y + delta_x * sine + delta_y * cosine,
+                z_value,
+            )
+        )
+    return closed_polygon_section(work_part, points)
 
 
 def line_section(work_part, start, end):

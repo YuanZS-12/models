@@ -4,7 +4,12 @@ import NXOpen
 import NXOpen.Features
 import NXOpen.GeometricUtilities
 
-from _probe_support import closed_rectangle_section, line_section, run_probe
+from _probe_support import (
+    closed_rectangle_section,
+    closed_rotated_rectangle_section,
+    line_section,
+    run_probe,
+)
 
 
 RAW_NXOPEN_HIGH_FIDELITY = True
@@ -22,7 +27,12 @@ DESIGN_LEDGER = {
 
 
 def operation(session, work_part, report):
-    section = closed_rectangle_section(work_part, 0.0, 10.0, 5.0)
+    root = closed_rectangle_section(work_part, 0.0, 10.0, 5.0)
+    # The upper-right corner remains on the guide while the terminal section is
+    # rotated 20 degrees around that guide, matching the angular-law endpoint.
+    tip = closed_rotated_rectangle_section(
+        work_part, 40.0, 10.0, 5.0, 10.0, 5.0, 20.0
+    )
     guide = line_section(
         work_part,
         NXOpen.Point3d(10.0, 5.0, 0.0),
@@ -34,7 +44,7 @@ def operation(session, work_part, report):
     )
     try:
         builder.BodyPreference.BodyType = NXOpen.GeometricUtilities.FeatureOptions.BodyStyle.Solid
-        builder.SectionList.Append(section)
+        builder.SectionList.Append([root, tip])
         builder.GuideList.Append(guide)
         angular_law = builder.OrientationMethod.AngularLaw
         angular_law.LawType = NXOpen.GeometricUtilities.LawBuilder.Type.Linear
@@ -49,6 +59,7 @@ def operation(session, work_part, report):
         builder.Destroy()
     report["api_generation"] = "SweptBuilder1"
     report["angular_law_degrees"] = [0.0, 20.0]
+    report["section_count"] = 2
 
 
 def main():

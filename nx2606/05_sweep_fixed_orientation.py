@@ -22,9 +22,12 @@ DESIGN_LEDGER = {
 
 
 def operation(session, work_part, report):
-    section = closed_rectangle_section(work_part, 0.0, 10.0, 5.0)
-    # The guide intersects the section at its upper-right corner. Sweep guide
-    # strings that miss the profile are rejected as invalid section strings.
+    root = closed_rectangle_section(work_part, 0.0, 10.0, 5.0)
+    tip = closed_rectangle_section(work_part, 40.0, 10.0, 5.0)
+    # The first manual run showed that a one-section guide could not be
+    # approximated in NX 2606. Keep the same fixed orientation and add only an
+    # identical terminal section, matching the two-section contract proved by
+    # probe 06.
     guide = line_section(
         work_part,
         NXOpen.Point3d(10.0, 5.0, 0.0),
@@ -36,7 +39,7 @@ def operation(session, work_part, report):
     )
     try:
         builder.BodyPreference.BodyType = NXOpen.GeometricUtilities.FeatureOptions.BodyStyle.Solid
-        builder.SectionList.Append(section)
+        builder.SectionList.Append([root, tip])
         builder.GuideList.Append(guide)
         builder.OrientationMethod.OrientationOption = (
             NXOpen.GeometricUtilities.OrientationMethodBuilder.OrientationOptions.Fixed
@@ -50,6 +53,7 @@ def operation(session, work_part, report):
         builder.Destroy()
     report["api_generation"] = "SweptBuilder1"
     report["orientation"] = "Fixed"
+    report["section_count"] = 2
 
 
 def main():
