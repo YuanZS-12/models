@@ -1,0 +1,59 @@
+"""User-run NX 2606 probe: SweptBuilder1 linear angular-law solid."""
+
+import NXOpen
+import NXOpen.Features
+import NXOpen.GeometricUtilities
+
+from _probe_support import closed_rectangle_section, line_section, run_probe
+
+
+RAW_NXOPEN_HIGH_FIDELITY = True
+USER_MANUAL_NX_EXECUTION_REQUIRED = True
+STATIC_ONLY_NXOPEN_REVIEW = {
+    "recipe": "nx2606.sweep.angular-law",
+    "official_pages": ["a47559.html", "a56995.html", "a56867.html", "a56875.html"],
+    "runtime": "manual user run required",
+}
+DESIGN_LEDGER = {
+    "target_nx_version": "NX 2606",
+    "expected_body_count": 1,
+    "critical_features": ["swept_builder1_linear_angular_law_solid"],
+}
+
+
+def operation(session, work_part, report):
+    section = closed_rectangle_section(work_part, 0.0, 10.0, 5.0)
+    guide = line_section(
+        work_part,
+        NXOpen.Point3d(10.0, 5.0, 0.0),
+        NXOpen.Point3d(10.0, 5.0, 40.0),
+    )
+
+    builder = work_part.Features.FreeformSurfaceCollection.CreateSweptBuilder1(
+        NXOpen.Features.Swept.Null
+    )
+    try:
+        builder.BodyPreference.BodyType = NXOpen.GeometricUtilities.FeatureOptions.BodyStyle.Solid
+        builder.SectionList.Append(section)
+        builder.GuideList.Append(guide)
+        angular_law = builder.OrientationMethod.AngularLaw
+        angular_law.LawType = NXOpen.GeometricUtilities.LawBuilder.Type.Linear
+        angular_law.StartValue.RightHandSide = "0"
+        angular_law.EndValue.RightHandSide = "20"
+        builder.OrientationMethod.OrientationOption = (
+            NXOpen.GeometricUtilities.OrientationMethodBuilder.OrientationOptions.ByAngularLaw
+        )
+        feature = builder.CommitFeature()
+        print("NXCAD_FEATURE_COMMITTED:", feature)
+    finally:
+        builder.Destroy()
+    report["api_generation"] = "SweptBuilder1"
+    report["angular_law_degrees"] = [0.0, 20.0]
+
+
+def main():
+    run_probe(__file__, "NX 2606", "07_sweep_angular_law", 1, operation)
+
+
+if __name__ == "__main__":
+    main()

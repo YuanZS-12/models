@@ -22,15 +22,18 @@ Current probes:
 | `02_closed_polyline_section.py` | closed Section and curve rules | verified by manual NX 2606 run |
 | `03_closed_spline_section.py` | periodic StudioSplineBuilderEx curve | verified by manual NX 2606 run |
 | `04_through_curves_solid.py` | two-section solid loft | verified by manual NX 2606 run |
+| `05_sweep_fixed_orientation.py` | SweptBuilder1 one-section/one-guide fixed-orientation solid | experimental; manual NX 2606 run required |
+| `06_sweep_two_sections.py` | SweptBuilder1 two-section tapered solid | experimental; manual NX 2606 run required |
+| `07_sweep_angular_law.py` | SweptBuilder1 linear angular-law solid | experimental; manual NX 2606 run required |
 | `08_boolean_unite.py` | overlapping-body boolean unite | verified by manual NX 2606 run |
 | `09_edge_blend.py` | collector + AddChainset edge blend | verified by manual NX 2606 run |
-| `10_step_ap242.py` | generic StepCreator native save and solid STEP export | experimental; 004 manual rerun required after enabling `ObjectTypes.Solids` |
+| `10_step_ap242.py` | generic StepCreator native save and solid STEP export | rejected configuration; current output remains metadata-only with `ObjectTypes.Solids=True` |
 
-Reserved probes `05` through `07` cover fixed-orientation, tapered, and
-angular-law sweep configurations. They are intentionally not generated from
-memory. The attempted NX 2606 angular-law and section-string configurations
-already have user-reported failures. New sweep probes require exact API review
-and a conservative recipe before handoff.
+Probes `05` through `07` use `SweptBuilder1`, introduced in NX 2412 through
+`work_part.Features.FreeformSurfaceCollection.CreateSweptBuilder1(...)`.
+Siemens marks the older `SweptBuilder` API used by the failed S3 configuration
+deprecated from NX 2412. The new probes remain experimental until the user runs
+them manually and returns their reports.
 
 Validate a returned result locally without starting NX:
 

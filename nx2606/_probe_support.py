@@ -118,6 +118,46 @@ def unite(work_part, target_feature, tool_feature):
         builder.Destroy()
 
 
+def _section_from_curves(work_part, curves, help_points):
+    section = work_part.Sections.CreateSection(0.01, 0.0095, 0.5)
+    section.SetAllowedEntityTypes(NXOpen.Section.AllowTypes.OnlyCurves)
+    options = work_part.ScRuleFactory.CreateRuleOptions()
+    try:
+        for curve, help_point in zip(curves, help_points):
+            rule = work_part.ScRuleFactory.CreateRuleBaseCurveDumb([curve], options)
+            section.AddToSection(
+                [rule],
+                curve,
+                NXOpen.NXObject.Null,
+                NXOpen.NXObject.Null,
+                help_point,
+                NXOpen.Section.Mode.Create,
+                False,
+            )
+    finally:
+        options.Dispose()
+    return section
+
+
+def closed_rectangle_section(work_part, z_value, half_width, half_height):
+    points = [
+        NXOpen.Point3d(-half_width, -half_height, z_value),
+        NXOpen.Point3d(half_width, -half_height, z_value),
+        NXOpen.Point3d(half_width, half_height, z_value),
+        NXOpen.Point3d(-half_width, half_height, z_value),
+    ]
+    curves = [
+        work_part.Curves.CreateLine(point, points[(index + 1) % len(points)])
+        for index, point in enumerate(points)
+    ]
+    return _section_from_curves(work_part, curves, points)
+
+
+def line_section(work_part, start, end):
+    curve = work_part.Curves.CreateLine(start, end)
+    return _section_from_curves(work_part, [curve], [start])
+
+
 def export_step(session, work_part, output_path):
     status = work_part.Save(
         NXOpen.BasePart.SaveComponents.TrueValue,
