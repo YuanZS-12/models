@@ -14,8 +14,8 @@ cturing Information (PMI)---4.0---2014-10-13',
 /* implementation_level */ '2;1');
 
 FILE_NAME(
-/* name */ '10_step_ap242_run_003',
-/* time_stamp */ '2026-07-15T15:41:06+08:00',
+/* name */ '10_step_ap242',
+/* time_stamp */ '2026-07-15T15:54:43+08:00',
 /* author */ (''),
 /* organization */ (''),
 /* preprocessor_version */ 'ST-DEVELOPER v20',
@@ -24,68 +24,10 @@ FILE_NAME(
 
 FILE_SCHEMA (('AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF { 1 0 10303 442 1 1 4 }'));
 ENDSEC;
-UG to STEP
-! INFO-     NX STEP AP242 - V2506.1400
-! INFO-      
-! INFO-     Start of Translation: 15-JUL-2026  3:41:05 PM
-! INFO-      
-! STATUS-   Converting Part: C:\apps\devop_tools\UDU\test11\models-main\nx2606\10_step_ap242_run_003.prt
-! STATUS-    
-! STATUS-   Converting to Output Form (Phase 2 of 3): 15-JUL-2026 3:41:05 PM
-! STATUS-    
-! INFO-     Bspline aprx. value in effect for this translation :0.025400 milimeters 
-! INFO-      
-! INFO-           Summary of STEP Entities 
-! INFO-      
-! INFO-     Entity Type                                                   Count 
-! INFO-     -----------                                                   ------ 
-! INFO-     application_context ......................................:   1 
-! INFO-     application_protocol_definition ..........................:   1 
-! INFO-     axis2_placement_3d .......................................:   1 
-! INFO-     cartesian_point ..........................................:   1 
-! INFO-     direction ................................................:   2 
-! INFO-     geometric_representation_context_and_global_uncertainty_a :   1 
-! INFO-     length_unit_and_si_unit ..................................:   1 
-! INFO-     mechanical_design_geometric_presentation_representation ..:   1 
-! INFO-     plane_angle_unit_and_si_unit .............................:   1 
-! INFO-     product ..................................................:   1 
-! INFO-     product_category .........................................:   1 
-! INFO-     product_context ..........................................:   1 
-! INFO-     product_definition .......................................:   1 
-! INFO-     product_definition_context ...............................:   1 
-! INFO-     product_definition_formation_with_specified_source .......:   1 
-! INFO-     product_definition_shape .................................:   1 
-! INFO-     product_related_product_category .........................:   1 
-! INFO-     shape_definition_representation ..........................:   1 
-! INFO-     shape_representation .....................................:   1 
-! INFO-     si_unit_and_solid_angle_unit .............................:   1 
-! INFO-     uncertainty_measure_with_unit ............................:   1 
-! INFO-                                                                  ------- 
-! INFO-     Total                                                         22 
-! INFO-      
-! INFO-     End of Translation: 15-JUL-2026  3:41:06 PM
-! INFO-      
-{
-  "agent_execution": false,
-  "body_count": 1,
-  "manual_user_run": true,
-  "native_part": {
-    "exists": true,
-    "path": "C:\\apps\\devop_tools\\UDU\\test11\\models-main\\nx2606\\10_step_ap242_run_003.prt"
-  },
-  "nx_version": "NX 2606",
-  "probe": "10_step_ap242",
-  "result": "success",
-  "schema_version": 1,
-  "step": {
-    "exists": true,
-    "path": "C:\\apps\\devop_tools\\UDU\\test11\\models-main\\nx2606\\10_step_ap242_run_003.step",
-    "size": 2273
-  }
-}
+
 DATA;
 #10=SHAPE_DEFINITION_REPRESENTATION(#21,#11);
-#11=SHAPE_REPRESENTATION('10_step_ap242_run_003',(#12),#16);
+#11=SHAPE_REPRESENTATION('10_step_ap242',(#12),#16);
 #12=AXIS2_PLACEMENT_3D('',#15,#13,#14);
 #13=DIRECTION('',(0.,0.,1.));
 #14=DIRECTION('',(1.,0.,0.));
@@ -94,8 +36,7 @@ DATA;
 GEOMETRIC_REPRESENTATION_CONTEXT(3)
 GLOBAL_UNCERTAINTY_ASSIGNED_CONTEXT((#17))
 GLOBAL_UNIT_ASSIGNED_CONTEXT((#20,#19,#18))
-REPRESENTATION_CONTEXT('10_step_ap242_run_003',
-'TOP_LEVEL_ASSEMBLY_PART')
+REPRESENTATION_CONTEXT('10_step_ap242','TOP_LEVEL_ASSEMBLY_PART')
 );
 #17=UNCERTAINTY_MEASURE_WITH_UNIT(LENGTH_MEASURE(1.E-5),#20,
 'DISTANCE_ACCURACY_VALUE','Maximum Tolerance applied to model');
@@ -120,8 +61,7 @@ SI_UNIT(.MILLI.,.METRE.)
 #24=PRODUCT_DEFINITION_FORMATION_WITH_SPECIFIED_SOURCE('','',#26,
  .NOT_KNOWN.);
 #25=PRODUCT_RELATED_PRODUCT_CATEGORY('','',(#26));
-#26=PRODUCT('10_step_ap242_run_003','10_step_ap242_run_003',
-'10_step_ap242_run_003',(#28));
+#26=PRODUCT('10_step_ap242','10_step_ap242','10_step_ap242',(#28));
 #27=PRODUCT_CATEGORY('','');
 #28=PRODUCT_CONTEXT('',#30,'mechanical');
 #29=APPLICATION_PROTOCOL_DEFINITION('international standard',
@@ -129,3 +69,21 @@ SI_UNIT(.MILLI.,.METRE.)
 #30=APPLICATION_CONTEXT('managed model based 3d engineering');
 ENDSEC;
 END-ISO-10303-21;
+{
+  "agent_execution": false,
+  "body_count": 1,
+  "manual_user_run": true,
+  "native_part": {
+    "exists": true,
+    "path": "C:\\apps\\devop_tools\\UDU\\test11\\models-main\\nx2606\\10_step_ap242.prt"
+  },
+  "nx_version": "NX 2606",
+  "probe": "10_step_ap242",
+  "result": "success",
+  "schema_version": 1,
+  "step": {
+    "exists": true,
+    "path": "C:\\apps\\devop_tools\\UDU\\test11\\models-main\\nx2606\\10_step_ap242.step",
+    "size": 2221
+  }
+}
