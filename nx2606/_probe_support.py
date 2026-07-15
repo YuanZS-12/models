@@ -131,11 +131,14 @@ def export_step(session, work_part, output_path):
             creator = dex_manager.CreateStepCreator()
             creator.ExportAs = NXOpen.StepCreator.ExportAsOption.Ap242
             creator.ExportFrom = NXOpen.StepCreator.ExportFromOption.DisplayPart
+            # StepCreator object filters are not implicitly enabled. NX 2606
+            # can otherwise translate the part envelope while emitting only
+            # product metadata and no B-rep geometry.
+            creator.ObjectTypes.Solids = True
             creator.FileSaveFlag = False
             creator.ProcessHoldFlag = True
-            # The DisplayPart-only NX 2606 rerun saved the native PRT but
-            # produced no STEP. Retest the original InputFile combination with
-            # a unique per-run output so no stale file can mask the result.
+            # Keep the 003 InputFile configuration unchanged so the 004 run
+            # isolates ObjectTypes.Solids as the only export-setting change.
             creator.InputFile = work_part.FullPath
         elif hasattr(dex_manager, "CreateStep214Creator"):
             creator = dex_manager.CreateStep214Creator()

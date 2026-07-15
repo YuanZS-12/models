@@ -24,7 +24,7 @@ Current probes:
 | `04_through_curves_solid.py` | two-section solid loft | verified by manual NX 2606 run |
 | `08_boolean_unite.py` | overlapping-body boolean unite | verified by manual NX 2606 run |
 | `09_edge_blend.py` | collector + AddChainset edge blend | verified by manual NX 2606 run |
-| `10_step_ap242.py` | generic StepCreator native save and non-empty STEP export | verified by manual NX 2606 run |
+| `10_step_ap242.py` | generic StepCreator native save and solid STEP export | experimental; 004 manual rerun required after enabling `ObjectTypes.Solids` |
 
 Reserved probes `05` through `07` cover fixed-orientation, tapered, and
 angular-law sweep configurations. They are intentionally not generated from
