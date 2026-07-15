@@ -124,22 +124,26 @@ def export_step(session, work_part, output_path):
     )
     safe_dispose(status)
     dex_manager = session.DexManager
-    if hasattr(dex_manager, "CreateStepCreator"):
-        creator = dex_manager.CreateStepCreator()
-        creator.ExportAs = NXOpen.StepCreator.ExportAsOption.Ap242
-        creator.ExportFrom = NXOpen.StepCreator.ExportFromOption.DisplayPart
-        creator.FileSaveFlag = False
-        creator.ProcessHoldFlag = True
-    elif hasattr(dex_manager, "CreateStep214Creator"):
-        creator = dex_manager.CreateStep214Creator()
-    else:
-        raise RuntimeError("NX DexManager exposes neither CreateStepCreator nor CreateStep214Creator")
+    creator = None
     try:
-        creator.InputFile = work_part.FullPath
+        if hasattr(dex_manager, "CreateStepCreator"):
+            creator = dex_manager.CreateStepCreator()
+            creator.ExportAs = NXOpen.StepCreator.ExportAsOption.Ap242
+            creator.ExportFrom = NXOpen.StepCreator.ExportFromOption.DisplayPart
+            creator.FileSaveFlag = False
+            creator.ProcessHoldFlag = True
+        elif hasattr(dex_manager, "CreateStep214Creator"):
+            creator = dex_manager.CreateStep214Creator()
+        else:
+            raise RuntimeError("NX DexManager exposes neither CreateStepCreator nor CreateStep214Creator")
+        # DisplayPart export operates on the live display part. Setting
+        # InputFile at the same time can make NX translate only the saved file
+        # envelope and produce an AP242 file with no solid representation.
         creator.OutputFile = output_path
         creator.Commit()
     finally:
-        creator.Destroy()
+        if creator is not None:
+            creator.Destroy()
     if not os.path.isfile(output_path) or os.path.getsize(output_path) <= 0:
         raise RuntimeError("STEP export did not create a non-empty file: " + output_path)
     return output_path
