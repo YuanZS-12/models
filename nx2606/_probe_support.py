@@ -116,7 +116,17 @@ def export_step(session, work_part, output_path):
         NXOpen.BasePart.CloseAfterSave.FalseValue,
     )
     safe_dispose(status)
-    creator = session.DexManager.CreateStep214Creator()
+    dex_manager = session.DexManager
+    if hasattr(dex_manager, "CreateStepCreator"):
+        creator = dex_manager.CreateStepCreator()
+        creator.ExportAs = NXOpen.StepCreator.ExportAsOption.Ap242
+        creator.ExportFrom = NXOpen.StepCreator.ExportFromOption.DisplayPart
+        creator.FileSaveFlag = False
+        creator.ProcessHoldFlag = True
+    elif hasattr(dex_manager, "CreateStep214Creator"):
+        creator = dex_manager.CreateStep214Creator()
+    else:
+        raise RuntimeError("NX DexManager exposes neither CreateStepCreator nor CreateStep214Creator")
     try:
         creator.InputFile = work_part.FullPath
         creator.OutputFile = output_path
