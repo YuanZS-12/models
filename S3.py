@@ -1,35 +1,25 @@
 """
-Create a single solid aircraft flight-control bellcrank STEP model in millimeters.
+Use the nx-cad Raw NXOpen high-fidelity mode. Generate direct NXOpen Python code and do not use NXBuilder.
 
-The bellcrank lies primarily in the XY plane and is symmetric about its 12 mm thickness in Z. Center the part thickness about Z = 0, so its bottom is at Z = -6 mm and its top is at Z = 6 mm.
+Create a single solid aircraft control bellcrank in millimeters.
 
-Create a central circular pivot hub 50 mm in diameter and 12 mm thick, centered at X = 0 and Y = 0.
+Center a cylindrical pivot hub at the origin. The hub is 50 mm in diameter and 14 mm thick, centered about Z = 0. Add a 20 mm vertical through-bore and a 32 mm diameter, 4 mm deep bearing seat on both faces.
 
-Add a central vertical through-bore 20 mm in diameter through the pivot hub. Add a concentric bearing seat on the top face, 32 mm in diameter and 4 mm deep. Add an identical concentric bearing seat on the bottom face, 32 mm in diameter and 4 mm deep. The remaining central web around the bore must stay continuous.
+Create two curved control arms in the XY plane. The first arm follows a cubic B-spline from the pivot hub to an end boss centered at X = 100 mm, Y = 20 mm. The second follows a cubic B-spline to an end boss centered at X = -35 mm, Y = 85 mm.
 
-Create a first control arm extending from the central hub toward positive X. The center of its end boss is located at X = 85 mm and Y = 0. The arm should taper smoothly from 34 mm wide where it joins the central hub to 24 mm wide near the end boss. Keep the main arm web 8 mm thick and centered about Z = 0.
+Make each arm a swept solid following its spline. Use rounded airfoil-like cross sections normal to the curve. Taper each arm from 32 mm wide and 12 mm thick at the hub to 22 mm wide and 9 mm thick at the end boss. Apply 10 degrees of progressive twist along each arm.
 
-Create a circular end boss at X = 85 mm and Y = 0. The boss is 34 mm in diameter and 12 mm thick. Add a vertical through-hole 10 mm in diameter through the center of this boss.
+Make both end bosses 32 mm in diameter and 14 mm thick. Add a 10 mm vertical through-hole through each boss.
 
-Create a second control arm extending from the central hub toward positive Y. The center of its end boss is located at X = 0 and Y = 70 mm. The arm should taper smoothly from 32 mm wide where it joins the central hub to 22 mm wide near the end boss. Keep this arm web 8 mm thick and centered about Z = 0.
+Add one 16 mm lightening hole through the middle region of each arm. Maintain at least 5 mm of material around every hole.
 
-Create a circular end boss at X = 0 and Y = 70 mm. The boss is 32 mm in diameter and 12 mm thick. Add a vertical through-hole 8 mm in diameter through the center of this boss.
+Blend the arms into the central hub with 6 mm fillets and into the end bosses with 4 mm fillets. Chamfer all bore entrances by 0.8 mm.
 
-Add raised reinforcement pads on the top and bottom surfaces around the central pivot hub and both end bosses. Each reinforcement pad should blend into its corresponding arm. Keep the total finished thickness at each hub or boss equal to 12 mm and the arm web thickness equal to 8 mm.
+Use named parameters for dimensions, spline control points, section sizes, twist angles, and boolean overlaps.
 
-Add one circular lightening hole, 16 mm in diameter, through the positive-X arm. Locate it at X = 52 mm and Y = 0.
+The finished model must be one continuous closed solid. Do not replace the curved arms with straight boxes or simple cylinders.
 
-Add one circular lightening hole, 14 mm in diameter, through the positive-Y arm. Locate it at X = 0 and Y = 42 mm.
-
-Maintain at least 4 mm of material between every lightening hole and the nearest outside edge. Maintain at least 5 mm of radial material around each pivot or attachment bore.
-
-Add 4 mm fillets at the transitions between both arms and the central hub. Add 3 mm fillets where each arm joins its end boss. Add 1 mm fillets to the remaining exposed outside edges where geometrically safe.
-
-Add 0.8 mm chamfers to the top and bottom edges of the central bore and both attachment holes. Do not chamfer the bearing-seat shoulders.
-
-The finished model must be one continuous, closed, positive-volume solid. All arm-to-hub and arm-to-boss connections must have real volume overlap and must not rely on tangent or face-only contact.
-
-Export the native Siemens NX part as an aircraft_control_bellcrank.prt file and export an aircraft_control_bellcrank.step file next to it.
+Save as aircraft_curved_bellcrank.prt and export aircraft_curved_bellcrank.step next to the journal.
 
 """
 
