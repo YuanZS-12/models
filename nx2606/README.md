@@ -18,13 +18,13 @@ Current probes:
 
 | Probe | Purpose | Recipe status |
 | --- | --- | --- |
-| `01_create_part.py` | work-part creation/load-status handling | experimental |
-| `02_closed_polyline_section.py` | closed Section and curve rules | experimental |
-| `03_closed_spline_section.py` | periodic StudioSplineBuilderEx curve | experimental |
-| `04_through_curves_solid.py` | two-section solid loft | experimental |
-| `08_boolean_unite.py` | overlapping-body boolean unite | experimental |
-| `09_edge_blend.py` | collector + AddChainset edge blend | experimental |
-| `10_step_ap242.py` | native save and non-empty STEP export | experimental |
+| `01_create_part.py` | work-part creation/load-status handling | verified by manual NX 2606 run |
+| `02_closed_polyline_section.py` | closed Section and curve rules | verified by manual NX 2606 run |
+| `03_closed_spline_section.py` | periodic StudioSplineBuilderEx curve | verified by manual NX 2606 run |
+| `04_through_curves_solid.py` | two-section solid loft | verified by manual NX 2606 run |
+| `08_boolean_unite.py` | overlapping-body boolean unite | verified by manual NX 2606 run |
+| `09_edge_blend.py` | collector + AddChainset edge blend | verified by manual NX 2606 run |
+| `10_step_ap242.py` | generic StepCreator native save and non-empty STEP export | repaired; manual rerun required |
 
 Reserved probes `05` through `07` cover fixed-orientation, tapered, and
 angular-law sweep configurations. They are intentionally not generated from

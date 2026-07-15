@@ -20,7 +20,12 @@ def safe_dispose(value):
 def create_work_part_if_needed(session, stem):
     if session.Parts.Work is not None:
         return session.Parts.Work
-    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), stem)
+    base_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), stem)
+    path = base_path
+    suffix = 1
+    while os.path.exists(path) or os.path.exists(path + ".prt"):
+        path = "%s_run_%03d" % (base_path, suffix)
+        suffix += 1
     result = session.Parts.NewDisplay(path, NXOpen.Part.Units.Millimeters)
     status = None
     if isinstance(result, tuple):
@@ -29,7 +34,9 @@ def create_work_part_if_needed(session, stem):
     else:
         part = result
     safe_dispose(status)
-    return session.Parts.Work or part
+    work_part = session.Parts.Work or part
+    print("NXCAD_WORK_PART_PATH:", path)
+    return work_part
 
 
 def report_path(probe_file):
