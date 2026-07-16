@@ -1,137 +1,157 @@
-使用已安装的 nx-cad skill，执行 NX 2606 首轮 dc_mcp_server 集成验证。
+#01_create_part.dc_result.md
+# Journal Execution Result
+**Journal:** `C:\Users\z004n36r\.agents\nx_mcp_runs\integration_002\01_create_part.py`
+**Exit code:** `TIMEOUT`
+**Duration:** 90.03 s
+**Working directory:** `C:\Users\z004n36r\.agents\nx_mcp_runs\integration_002`
 
-环境：
-- NX、Designcenter 和 dc_mcp_server 已由用户手动启动。
-- dc_* 七个 MCP 工具在当前 Copilot 会话中均可见。
-- 用户明确授权本任务进入 mcp_execute。
-- canonical skill 路径：
-  C:\Users\z004n36r\.agents\skills\nx-cad
-- 本轮独立工作目录：
-  C:\Users\z004n36r\.agents\nx_mcp_runs\integration_002
+*No new output files detected.*
 
-硬性要求：
-1. 先完整阅读：
-   C:\Users\z004n36r\.agents\skills\nx-cad\SKILL.md
-   C:\Users\z004n36r\.agents\skills\nx-cad\references\mcp-runtime.md
-   C:\Users\z004n36r\.agents\skills\nx-cad\assets\runtime-probes\dc-mcp-integration-manifest.json
-2. 不修改 canonical skill 内的任何文件。
-3. 不启动或关闭 NX。
-4. 不复用当前 work part。
-5. 不覆盖任何 PRT、STEP、JSON、Markdown 或 Journal。
-6. 不使用上一轮 review-evidence-01.json、review-evidence-06.json。
-7. 只记录实际成功调用的 dc_* 工具；禁止模拟或推测 MCP 结果。
-8. 如果任何 dc_* 工具实际不可调用，立即停止，不得伪造 review evidence。
-9. 本轮只运行 probe 01 和 probe 06，不运行 07、10。
-10. 每个 Journal 执行前必须通过 check-journal --strict-geometry。
+> **WARNING:** Journal exceeded the 90 s timeout and was terminated.
 
-第一阶段：probe 01 API review
+## Diagnostics
+- License-related failure signals were detected.
+- SPLM_LICENSE_SERVER: `cloud`
+- UGII_LICENSE_FILE: `27000@shappdctclnx1,27000@shlv6002`
+- UGS_LICENSE_BUNDLE: `<not set>`
+- UGII_BASE_DIR: `D:\Workdir\iproot\nx2606.1700\test44\wntx64\kits`
+- Resolved run_journal.exe: `D:\Workdir\iproot\nx2606.1700\test44\wntx64\kits\nxbin\run_journal.exe`
+- Candidate run_journal.exe paths:
+  - `D:\Workdir\iproot\nx2606.1700\test44\wntx64\kits\nxbin\run_journal.exe`
 
-实际调用：
-- dc_lookup_pattern：
-  query="create new part"
-  limit=3
-- dc_get_api_info：
-  info_type="method"
-  class_name="NXOpen.PartCollection"
-  method_name="NewDisplay"
-- 根据需要查询 NXOpen.Part、NXOpen.Part.Units 和 BasePart.Save 的真实签名。
 
-将每次 MCP 查询的完整原始 Markdown 原样保存到：
-C:\Users\z004n36r\.agents\nx_mcp_runs\integration_002\01-api-review.md
+#01-api-review.md
+# Probe 01 — API Review
+## dc_lookup_pattern: query="create new part", limit=3
 
-根据实际返回创建：
-C:\Users\z004n36r\.agents\nx_mcp_runs\integration_002\review-evidence-01.json
+# Designcenter journal Patterns matching: `create new part`
 
-JSON 的 tools 只能包含实际成功调用的工具，facts 只能记录实际返回确认的事实。
-没有调用 dc_run_snippet，就不能把它写入 tools。
+## 1. Creating a new NX part file in a headless journal *(score: 14)*
+**Solution:** Use theSession.Parts.NewDisplay(path, NXOpen.Part.Units.Millimeters). PartCollection has NO NewPart method  --  it does not exist.
 
-准备 probe 01：
+```python
+workPart = theSession.Parts.NewDisplay('C:/Temp/my.prt', NXOpen.Part.Units.Millimeters)
+```
 
-py -3 C:\Users\z004n36r\.agents\skills\nx-cad\scripts\prepare-dc-mcp-journal C:\Users\z004n36r\.agents\skills\nx-cad\assets\runtime-probes\nx2606\01_create_part.py C:\Users\z004n36r\.agents\nx_mcp_runs\integration_002\01_create_part.py --review-evidence C:\Users\z004n36r\.agents\nx_mcp_runs\integration_002\review-evidence-01.json --user-authorized
+## 2. theSession.Parts.NewDisplay() throws NXException 'File already exists' if the output .prt path already exists on disk *(score: 12)*
+**Solution:** CONFIRMED: Parts.NewDisplay(path, ...) raises NXException with message 'File already exists' when the target .prt file is present  --  it does NOT silently overwrite. Delete the file first with os.remove(). Wrap in an existence check to avoid FileNotFoundError on first run.
 
-静态检查：
+```python
+import os
+OUTPUT_PART = 'C:/Temp/my_model.prt'
+# CRITICAL: NewDisplay fails if file already exists
+if os.path.exists(OUTPUT_PART):
+    os.remove(OUTPUT_PART)
+workPart = theSession.Parts.NewDisplay(
+    OUTPUT_PART,
+    NXOpen.Part.Units.Millimeters  # second arg = units, NOT DisplayPartOption
+)
+```
 
-py -3 C:\Users\z004n36r\.agents\skills\nx-cad\scripts\check-journal C:\Users\z004n36r\.agents\nx_mcp_runs\integration_002\01_create_part.py --strict-geometry
+## 3. Creating a new part using the FileNew builder with a template (more powerful than Parts.NewDisplay) *(score: 12)*
+**Solution:** Use theSession.Parts.FileNew() to get a builder, configure TemplateFileName, ApplicationName, Units, NewFileName, then Commit(). CRITICAL: FileNew inherits from Builder, NOT FeatureBuilder  --  use Commit() not CommitFeature(). CommitFeature() raises AttributeError. Commit() returns the Part object directly. ApplicationName must be a valid registered name (e.g., 'ModelTemplate', 'AssemblyTemplate', 'DrawingTemplate')  --  use GetApplicationNames() to list them. TemplateFileName must match an available template (e.g., 'model-plain-1-mm-template.prt')  --  use GetAvailableTemplates() to list them. Same file-exists behavior as NewDisplay  --  fails if output path already exists. UseBlankTemplate=True with TemplateType=Item throws 'The selected template does not exist'  --  templates are required for FileNew.
 
-只有检查通过后才调用 dc_run_journal：
+```python
+import NXOpen
+import os
 
-journal_path=
-C:\Users\z004n36r\.agents\nx_mcp_runs\integration_002\01_create_part.py
+def main():
+    theSession = NXOpen.Session.GetSession()
+    
+    output_path = 'C:/Temp/my_template_part.prt'
+    if os.path.exists(output_path):
+        os.remove(output_path)
+    
+    fileNew = theSession.Parts.FileNew()
+    
+    # Configure template-based creation
+    fileNew.TemplateFileName = 'model-plain-1-mm-template.prt'
+    fileNew.UseBlankTemplate = False
+    fileNew.ApplicationName = 'ModelTemplate'
+    fileNew.Units = NXOpen.Part.Units.Millimeters
+    fileNew.NewFileName = output_path
+    fileNew.MakeDisplayedPart = True
+    fileNew.TemplateType = NXOpen.FileNewTemplateType.Item
+    
+    # CRITICAL: Use Commit(), NOT CommitFeature()  --  FileNew is a Builder, not FeatureBuilder
+    # CommitFeature() raises AttributeError: 'NXOpen.FileNew' object has no attribute 'CommitFeature'
+    nxObj = fileNew.Commit()  # Returns the Part object
+    fileNew.Destroy()
+    
+    workPart = theSession.Parts.Work
+    print(f'Created: {workPart.Leaf}, Units: {workPart.PartUnits}')
+    
+    # To discover available templates and application names:
+    # fileNew2 = theSession.Parts.FileNew()
+    # templates = fileNew2.GetAvailableTemplates()  # List[str] of template filenames
+    # appNames = fileNew2.GetApplicationNames()      # List[str] of valid app names
+    # fileNew2.Destroy()
 
-working_dir=
-C:\Users\z004n36r\.agents\nx_mcp_runs\integration_002
+if __name__ == '__main__':
+    main()
+```
 
-managed_mode=false
-timeout=90
+---
 
-把 dc_run_journal 返回的完整 Markdown 原样保存为：
-C:\Users\z004n36r\.agents\nx_mcp_runs\integration_002\01_create_part.dc-result.md
+## dc_get_api_info: info_type="method", class_name="NXOpen.PartCollection", method_name="NewDisplay"
 
-解析：
+# NewDisplay Method
+**Class:** `NXOpen.PartCollection`
+**Signature:** `NewDisplay(name: str, units: Part.Units) -> Part`
+**Category:** Collections
+**Description:** Creates a new .prt part and sets this part as the active display part. Note: This method should only be used to create new .prt parts. Use NXOpen.PartCollection.NewBaseDisplay to create other types of parts other than .prt parts.
+**Parameters:** 2
+  - `name: str`
+  - `units: Part.Units`
+**Return Type:** `Part`
+**Usage Patterns:**
+  - `obj.NewDisplay()`
 
-py -3 C:\Users\z004n36r\.agents\skills\nx-cad\scripts\parse-dc-mcp-result journal C:\Users\z004n36r\.agents\nx_mcp_runs\integration_002\01_create_part.dc-result.md --require-runtime-report --output C:\Users\z004n36r\.agents\nx_mcp_runs\integration_002\01_create_part.dc-result.json
+## dc_get_api_info: info_type="class", class_name="NXOpen.Part", property_filter="Units"
 
-找到实际生成的 .nxreport.json 后验证：
+# Part
+**Full name:** `NXOpen.Part`
+**Module:** `NXOpen`
+**Category:** General
+**Description:** Represents an NX part of type .prt.
+**Inherits from:** `NXOpen.BasePart`, `NXOpen.NXObject`, `NXOpen.TaggedObject`, `object`
 
-py -3 C:\Users\z004n36r\.agents\skills\nx-cad\scripts\check-runtime-report <实际nxreport路径> --expected-bodies 0
+## Methods (44 — omitted while property_filter is active)
 
-probe 01 必须全部成功后才能继续 probe 06。
+## Properties (0 of 86 match 'Units' — try a different prefix)
 
-第二阶段：probe 06 API review
+## Nested Types (6)
+### `NXOpen.Part.PartFamilyAttrType` *(enum)*
+  Members Include: |TextType| text attribute |NumericType| numeric attribute |IntegerType| integer attribute |DoubleType| double attribute |StringType| string attribute |PartType| part attribute |NameType| name attribute |InstanceType| instance attribute |ExpressionType| expression attribute |MirrorType| mirror attribute |DensityType| density attribute |FeatureType| feature attribute
+  **Members:** `TextType`, `NumericType`, `IntegerType`, `DoubleType`, `StringType`, `PartType`, `NameType`, `InstanceType`, `ExpressionType`, `MirrorType`, `DensityType`, `FeatureType`
+### `NXOpen.Part.Relations` *(enum)*
+  Members Include: |Standalone| no master model support |ReferenceExisting| Master model support |Mix| support any one of relation
+  **Members:** `Standalone`, `ReferenceExisting`, `Mix`
+### `NXOpen.Part.Units` *(enum)*
+  Members Include: |Inches| |Millimeters| |Mix| |Meters| |Micrometers|
+  **Members:** `Inches`, `Millimeters`, `Mix`, `Meters`, `Micrometers`
+### `NXOpen.Part.UpdateFromJtFileOptions` *(enum)*
+  Members Include: |Default| update geometry in JT Derived part from input JT file.
+  **Members:** `Default`
+### `NXOpen.Part.FeatureUpdateStatus` *(class)*
+  Contains feature update status report PartFeatureUpdateStatus_Struct NX is an alias for Part.FeatureUpdateStatus NX.
+  **Members:** *(no members)*
+### `NXOpen.Part.PartFamilyAttributeData` *(class)*
+  Contains part family attributes information PartPartFamilyAttributeData_Struct NX is an alias for Part.PartFamilyAttributeData NX.
+  **Members:** *(no members)*
 
-实际调用：
-- dc_lookup_pattern：
-  query="two section solid sweep with fixed orientation"
-  limit=3
-- dc_get_api_info：
-  info_type="method"
-  class_name="NXOpen.Features.FreeformSurfaceCollection"
-  method_name="CreateSweptBuilder1"
-- dc_get_api_info：
-  info_type="class"
-  class_name="NXOpen.Features.SweptBuilder1"
-- 核对 SectionList、GuideList、BodyPreference、OrientationMethod 和 CommitFeature 的真实签名及 enum。
+## dc_get_api_info: info_type="method", class_name="NXOpen.BasePart", method_name="Save"
 
-保存完整原始查询 Markdown到：
-C:\Users\z004n36r\.agents\nx_mcp_runs\integration_002\06-api-review.md
-
-根据实际查询结果创建：
-C:\Users\z004n36r\.agents\nx_mcp_runs\integration_002\review-evidence-06.json
-
-准备 probe 06：
-
-py -3 C:\Users\z004n36r\.agents\skills\nx-cad\scripts\prepare-dc-mcp-journal C:\Users\z004n36r\.agents\skills\nx-cad\assets\runtime-probes\nx2606\06_sweep_two_sections.py C:\Users\z004n36r\.agents\nx_mcp_runs\integration_002\06_sweep_two_sections.py --review-evidence C:\Users\z004n36r\.agents\nx_mcp_runs\integration_002\review-evidence-06.json --user-authorized
-
-静态检查：
-
-py -3 C:\Users\z004n36r\.agents\skills\nx-cad\scripts\check-journal C:\Users\z004n36r\.agents\nx_mcp_runs\integration_002\06_sweep_two_sections.py --strict-geometry
-
-只有检查通过后调用 dc_run_journal：
-
-journal_path=
-C:\Users\z004n36r\.agents\nx_mcp_runs\integration_002\06_sweep_two_sections.py
-
-working_dir=
-C:\Users\z004n36r\.agents\nx_mcp_runs\integration_002
-
-managed_mode=false
-timeout=300
-
-保存完整返回：
-C:\Users\z004n36r\.agents\nx_mcp_runs\integration_002\06_sweep_two_sections.dc-result.md
-
-解析并验证：
-
-py -3 C:\Users\z004n36r\.agents\skills\nx-cad\scripts\parse-dc-mcp-result journal C:\Users\z004n36r\.agents\nx_mcp_runs\integration_002\06_sweep_two_sections.dc-result.md --require-runtime-report --output C:\Users\z004n36r\.agents\nx_mcp_runs\integration_002\06_sweep_two_sections.dc-result.json
-
-py -3 C:\Users\z004n36r\.agents\skills\nx-cad\scripts\check-runtime-report <实际nxreport路径> --expected-bodies 1
-
-最终返回：
-- 实际调用的全部 dc_* 工具
-- 所有 MCP 原始 Markdown 文件路径
-- 两次 check-journal 输出
-- 两次 dc_run_journal exit code、stdout、stderr、output files
-- 两个 .nxreport.json 的完整内容与路径
-- 两个 PRT 的完整路径和文件大小
-- 是否发生修复以及修复次数
-- 不得仅用 exit code 0 宣称几何成功
+# Save Method
+**Class:** `NXOpen.BasePart`
+**Signature:** `Save(self, save_component_parts: BasePart.SaveComponents, close: BasePart.CloseAfterSave) -> PartSaveStatus`
+**Category:** General
+**Description:** Saves the part whether it is modified or not.
+**Parameters:** 3
+  - `self`
+  - `save_component_parts: BasePart.SaveComponents`
+  - `close: BasePart.CloseAfterSave`
+**Return Type:** `PartSaveStatus`
+**Usage Patterns:**
+  - `obj.Save()`
+#01-review-evidence-01.json
