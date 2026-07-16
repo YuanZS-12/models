@@ -1,31 +1,228 @@
-Create a single STEP model of a titanium alloy landing gear trunnion fitting for regional jet, in millimeters.
+Searched for text `dc_run_journal|dc_run_snippet|dc_search|dc_semantic_search|dc_get_api_info|dc_list_namespace|dc_lookup_pattern` (`**/wntx64\kits\dc_mcp_server\dc_mcp_server.py`), 20 results
 
-Centered on origin, aircraft longitudinal along X, lateral along Y, vertical load along Z.
+Read [](file:///d%3A/Workdir/iproot/nx2606.1700/test44/wntx64/kits/dc_mcp_server/dc_mcp_server.py#490-490), lines 490 to 800
 
-Add a Ti-6Al-4V ELI forging body, 280 × 195 × 142 mm, top plane at Z = 0. HIP processed, solution treated 925°C, aged 480°C, 1100 MPa UTS, 55 MPa√m toughness. Surfaces Ra 3.2 μm, bearing bores Ra 0.8 μm.
+Read [](file:///d%3A/Workdir/iproot/nx2606.1700/test44/wntx64/kits/dc_mcp_server/dc_mcp_server.py#800-800), lines 800 to 900
 
-Add a main trunnion bore, 85 mm H7, length 120 mm, axis along Y at X = 0, Z = -71 mm. Cylindricity 0.01 mm, straightness 0.005 mm, honed Ra 0.4 μm. Two grease grooves (3 × 2 mm, 40 mm spacing) at Y = ±30 mm. Six radial feed holes (4 mm, 45° spacing). 2 mm lead-in chamfer, 0.3 mm radius blend.
+Searched for text `def _handle_` (`**/wntx64\kits\dc_mcp_server\dc_mcp_server.py`), 6 results
 
-Add two upper wing lugs, 65 × 95 × 85 mm, spaced 142 mm at Y = ±71 mm. Each has 32 mm H8 bore, 65 mm deep, ground Ra 0.2 μm, 0.008 mm roundness. 8 mm wall minimum, 5 mm fillets. Outer faces: 0.5 mm deep serrations (0.8 mm pitch, 60°) for torque transmission.
+Read [](file:///d%3A/Workdir/iproot/nx2606.1700/test44/wntx64/kits/dc_mcp_server/dc_mcp_server.py#907-907), lines 907 to 970
 
-Add a lower shock boss, 110 mm diameter, 95 mm height, at X = 0, Y = 0, Z = -142 mm. Internal M80 × 2 thread, 60 mm depth, 6H tolerance, 0.05 mm pitch accuracy. 0.4 mm root radius relief. Cu-Ni anti-galling coating (8 μm Cu + 2 μm Ni) on flanks. Four lockwire holes (2 mm, 90° spacing) at base for 0.8 mm safety wire.
+以下是 `dc_mcp_server` 中七个工具的完整参数与返回结构总结：
 
-Add a side brace lug, 55 × 75 × 60 mm, at X = +140, Y = 0, Z = -95 mm. 28 mm H8 bore, 1.5 mm deep circlip groove. Canted 12° from vertical in XZ plane.
+---
 
-Add a drag brace ear, 40 × 60 × 50 mm, at X = -120, Y = 0, Z = -110 mm. 22 mm H9 bore, inclined 8° forward. 0.5 mm root fillet, 15 mm tapered transition.
+## 1. `dc_lookup_pattern` — 最佳实践查询（STEP 1，首选入口）
 
-Add six weight reduction pockets, 35 mm diameter × 18 mm deep, EDM on non-load surfaces: 2 at X = ±80, Y = ±50, Z = -30; 2 at X = ±60, Y = 0, Z = -50. 2 mm radius floors, 0.5° draft. Material removal limited to 8% mass.
+**参数：**
+| 参数 | 类型 | 必需 | 说明 |
+|---|---|---|---|
+| `query` | string | ✅ | 自然语言描述要做的操作，如 `"create new part"`, `"edge blend all edges"`, `"color palette full list"` |
+| `limit` | integer | ❌ | 返回结果条数，默认 3，最大 5 |
 
-Add a pressurization test port, M10 × 1.5 × 15 mm, at X = 0, Y = +98, Z = -71 mm. 3 mm radial hole to trunnion bore. Sealed with 250 MPa plug after 1.5× hydrostatic proof test.
+**返回结构：**
+```
+# Designcenter journal Patterns matching: `<query>`
+## 1. 标题 (score: N)
+**Solution:** 解决方案文字描述
+```python
+代码示例
+```
+## 2. ...
+```
+格式为 Markdown 文本，每个 pattern 包含标题、得分、解决方案描述和 Python 代码示例。
 
-Add four cadmium-plated steel bushings, 32 mm OD, 22 mm ID, 40 mm long, 0.02 mm interference fit in wing lugs. Three axial oil channels (1.5 × 1 mm, 120° spacing), two circumferential grooves. Chromium plated 25 μm, 1000 HV.
+---
 
-Add corrosion protection: alkaline clean, fluoride-phosphate pretreatment, 50 μm polyurethane primer (MIL-PRF-85285), 75 μm topcoat (FS 36375 gray). Bearing surfaces bare, MIL-PRF-81322 grease.
+## 2. `dc_search` — 名称搜索（STEP 2，已知名称时使用）
 
-Add forging parting line witness at Y = 0, Z = -35 mm: 0.3 mm ridge, 2 mm wide, 1:10 tapers, per AMS 4928 traceability.
+**参数：**
+| 参数 | 类型 | 必需 | 说明 |
+|---|---|---|---|
+| `query` | string | ✅ | 搜索词（类名、方法名、关键词），如 `"ExtrudeBuilder"`, `"CommitFeature"` |
+| `search_type` | string | ❌ | 结果类型限定：`"classes"` / `"methods"` / `"all"`（默认） |
+| `limit` | integer | ❌ | 最大结果数，默认 15 |
+| `category` | string | ❌ | 分类过滤：General, Features, Builders, Collections, Manufacturing 等 |
+| `class_filter` | string | ❌ | 按所属类名过滤方法 |
+| `return_type_filter` | string | ❌ | 按返回类型过滤方法 |
 
-Add UT reference notch: 0.5 × 0.3 × 8 mm, EDM at X = -90, Y = +98, Z = -20, for 5 MHz immersion calibration.
+**返回结构：**
+```
+# Search Results for '<query>'
+## Classes (N)
+1. **ClassName** (Category)
+   Full name: `NXOpen.xxx.ClassName`
+   Module: `NXOpen.xxx`
+   Description: 描述文字
+   Methods: N, Properties: N
+   Sample members: member1, member2, ...
 
-Add data plate, 25 × 15 × 0.5 mm stainless steel, riveted at X = +100, Y = +98, Z = -10. Marked: part number "LG-TR-195-85", serial, heat lot, HIP cycle, max loads "142 kN vertical, ±68 kN drag, ±45 kN side".
+## Methods (N)
+1. **MethodName** in `ClassName`
+   Signature: `MethodName(self, ...) -> ReturnType`
+   Category: xxx
+   Description: 描述文字
+   Usage: obj.MethodName()
+```
 
-Export as a STEP file.
+---
+
+## 3. `dc_semantic_search` — 语义搜索（STEP 2，未知名称时使用）
+
+**参数：**
+| 参数 | 类型 | 必需 | 说明 |
+|---|---|---|---|
+| `query` | string | ✅ | 自然语言描述，如 `"extrude a sketch profile"`, `"chamfer an edge"` |
+| `limit` | integer | ❌ | 最大结果数，默认 15 |
+| `use_vector_embeddings` | boolean | ❌ | 是否使用向量嵌入相似度，默认 true（不可用时降级为关键词） |
+
+**返回结构：**
+```
+# Semantic Search Results for: '<query>'
+Found N relevant items
+
+## Classes (N)
+- **ClassName** (`NXOpen.xxx.ClassName`)
+  Relevance: 0.xx
+  Description: 描述文字
+  Usage: 用法说明
+```
+与 `dc_search` 类似但附带相关性评分。
+
+---
+
+## 4. `dc_get_api_info` — 类/方法签名查询（STEP 3）
+
+**参数：**
+| 参数 | 类型 | 必需 | 说明 |
+|---|---|---|---|
+| `info_type` | string | ❌ | `"class"`（默认）/ `"method"` |
+| `class_name` | string | ✅ | 完整类名，如 `"NXOpen.Part"` |
+| `method_name` | string | ❌ | 方法名，`info_type="method"` 时必需 |
+| `method_filter` | string | ❌ | 按前缀过滤方法，如 `"Create"` |
+| `property_filter` | string | ❌ | 按前缀过滤属性，如 `"Thread"` |
+
+**返回结构（`info_type="class"`）：**
+```
+# ClassName
+**Full name:** `NXOpen.xxx.ClassName`
+**Module:** `NXOpen.xxx`
+**Category:** xxx
+**Description:** 描述文字
+**Inherits from:** 父类链
+
+## Properties (N)
+- `PropertyName(self) -> Type` *(settable)*
+  说明文字
+
+## Methods (N)
+- `MethodName(self, ...) -> ReturnType`
+  说明文字
+
+## Nested Types (N)
+### `NXOpen.xxx.ClassName.EnumName` *(enum)*
+  Members Include: |Member1| desc |Member2| desc
+  **Members:** `Member1`, `Member2`
+```
+
+---
+
+## 5. `dc_list_namespace` — 命名空间浏览（STEP 2，领域探索）
+
+**参数：**
+| 参数 | 类型 | 必需 | 说明 |
+|---|---|---|---|
+| `namespace` | string | ❌ | 命名空间，如 `"NXOpen.Features"`；省略则返回所有命名空间概览 |
+| `limit` | integer | ❌ | 最大返回类数，默认 50 |
+| `include_submodules` | boolean | ❌ | 是否包含子命名空间，默认 false |
+| `category` | string | ❌ | 分类过滤（同 `dc_search`） |
+
+**返回结构（指定 namespace 时）：**
+```
+# Classes in NXOpen.xxx (N total)
+
+## Category1 (N)
+- ClassName (N methods, N properties)
+  Description: 描述
+
+## Category2 (N)
+...
+```
+省略 namespace 时返回所有命名空间及其类数量统计。
+
+---
+
+## 6. `dc_run_journal` — 执行完整 journal 文件（STEP 6）
+
+**参数：**
+| 参数 | 类型 | 必需 | 说明 |
+|---|---|---|---|
+| `journal_path` | string | ✅ | journal 文件绝对路径（.py / .vb / .cs） |
+| `args` | string[] | ❌ | 传递给 journal `main()` 的 `-args` 参数 |
+| `managed_mode` | boolean | ❌ | Teamcenter 管理模式，默认 false |
+| `timeout` | integer | ❌ | 超时秒数，默认 300 |
+| `working_dir` | string | ❌ | 工作目录，默认 journal 所在目录 |
+
+**返回结构：**
+```
+# Journal Execution Result
+**Journal:** `<path>`
+**Exit code:** `<code>`        # 0=成功
+**Duration:** `<N> s`
+**Working directory:** `<path>`
+
+## Output files (N)
+- `<file_path>`
+
+## stdout
+```
+stdout 文本
+```
+
+## stderr
+```
+stderr 文本
+```
+```
+
+---
+
+## 7. `dc_run_snippet` — 执行内联代码片段（STEP 4，兜底方案）
+
+**参数：**
+| 参数 | 类型 | 必需 | 说明 |
+|---|---|---|---|
+| `code` | string | ✅ | Python 代码。auto_wrap 模式写纯语句（theSession/workPart 已绑定）；raw 模式写完整脚本 |
+| `mode` | string | ❌ | `"auto_wrap"`（默认）/ `"raw"` |
+| `timeout` | integer | ❌ | 超时秒数，默认 90 |
+
+**返回结构：**
+```
+# Snippet Result
+**Exit code:** `0`
+**Duration:** `<N> s`
+
+## stdout
+```
+print 输出文本
+```
+
+## stderr
+```
+错误输出（如有）
+```
+```
+
+---
+
+### 总结表
+
+| 工具 | 步骤 | 用途 | 必需参数 | 返回格式 |
+|---|---|---|---|---|
+| `dc_lookup_pattern` | STEP 1 | 查最佳实践/坑 | `query` | Markdown 段落 + 代码 |
+| `dc_search` | STEP 2 | 按名称搜 API | `query` | 类/方法列表 |
+| `dc_semantic_search` | STEP 2 | 按意图发现 API | `query` | 带相关性评分的类列表 |
+| `dc_list_namespace` | STEP 2 | 浏览命名空间 | 无（可选 namespace） | 类列表/命名空间统计 |
+| `dc_get_api_info` | STEP 3 | 查类/方法完整签名 | `class_name` | 属性/方法/嵌套类型详情 |
+| `dc_run_snippet` | STEP 4 | 执行内联代码探测 | `code` | 执行结果 + stdout/stderr |
+| `dc_run_journal` | STEP 6 | 执行完整 journal 文件 | `journal_path` | 退出码 + 输出文件 + 日志 |
