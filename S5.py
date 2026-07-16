@@ -1,30 +1,60 @@
-使用最新版 nx-cad skill，准备 probe 01 的用户手动 NX 运行副本。
+#py文件
+"""User-run NX 2606 probe: acquire or create one work part."""
 
-禁止调用 dc_run_snippet、dc_run_journal、run_journal.exe，禁止启动或关闭 NX。
-只允许进行 API review、文件准备和静态检查。
+import NXOpen
 
-canonical probe：
-C:\Users\z004n36r\.agents\skills\nx-cad\assets\runtime-probes\nx2606\01_create_part.py
+from _probe_support import run_probe
 
-复用上一轮真实查询证据：
-C:\Users\z004n36r\.agents\nx_mcp_runs\integration_002\review-evidence-01.json
 
-新工作目录：
-C:\Users\z004n36r\.agents\nx_mcp_runs\integration_003
+RAW_NXOPEN_HIGH_FIDELITY = True
+EXECUTION_POLICY = {'mode': 'manual_nx', 'manual_user_run_required': True, 'agent_execution': False, 'requires_prepared_nx_environment': True, 'allow_launch_or_close_nx': False, 'allow_existing_work_part': False, 'allow_overwrite': False, 'managed_mode': False, 'max_repair_attempts': 3}
+MCP_API_REVIEW = {'schema_version': 2, 'target_nx_version': 'NX 2606', 'probe': '01_create_part', 'runtime_mode': 'mcp_execute', 'tools': ['dc_lookup_pattern', 'dc_get_api_info'], 'facts': ['PartCollection.NewDisplay exists: NewDisplay(name: str, units: Part.Units) -> Part. Creates new .prt and sets as active display part.', 'Part.Units enum members: Inches, Millimeters, Mix, Meters, Micrometers.', 'Part inherits from BasePart -> NXObject -> TaggedObject -> object.', 'BasePart.Save signature: Save(save_component_parts: BasePart.SaveComponents, close: BasePart.CloseAfterSave) -> PartSaveStatus.', 'NewDisplay raises NXException if target .prt already exists. Must os.remove() first.', 'PartCollection has NO NewPart method.'], 'mcp_api_review_marker': True, 'notes': 'All API facts confirmed via actual dc_* MCP calls. No dc_run_snippet called.', 'server': 'dc_mcp_server'}
+DESIGN_LEDGER = {"target_nx_version": "NX 2606", "expected_body_count": 0, "critical_features": ["work_part"]}
 
-执行：
 
-py -3 C:\Users\z004n36r\.agents\skills\nx-cad\scripts\prepare-dc-mcp-journal C:\Users\z004n36r\.agents\skills\nx-cad\assets\runtime-probes\nx2606\01_create_part.py C:\Users\z004n36r\.agents\nx_mcp_runs\integration_003\01_create_part.py --review-evidence C:\Users\z004n36r\.agents\nx_mcp_runs\integration_002\review-evidence-01.json --manual-user-run
+def operation(session, work_part, report):
+    report["work_part"] = getattr(work_part, "FullPath", "") or getattr(work_part, "Name", "")
+    print("NXCAD_WORK_PART:", report["work_part"])
 
-然后执行：
 
-py -3 C:\Users\z004n36r\.agents\skills\nx-cad\scripts\check-journal C:\Users\z004n36r\.agents\nx_mcp_runs\integration_003\01_create_part.py --strict-geometry
+def main():
+    run_probe(__file__, "NX 2606", "01_create_part", 0, operation, EXECUTION_POLICY, DESIGN_LEDGER["critical_features"])
 
-确认生成的 Journal 满足：
-- mode=manual_nx
-- manual_user_run_required=true
-- agent_execution=false
-- 不包含 mcp_execute
-- check-journal 通过
 
-完成后只返回要由用户手动运行的 Journal 路径，不要尝试执行 NX。
+if __name__ == "__main__":
+    main()
+#json
+{
+  "artifacts": {
+    "prt": {
+      "exists": true,
+      "path": "C:\\Users\\z004n36r\\.agents\\nx_mcp_runs\\integration_003\\01_create_part_run_001.prt",
+      "size": 53880
+    }
+  },
+  "execution": {
+    "actor": "user",
+    "tool": "nx_ui",
+    "transport": "nx_ui"
+  },
+  "journal": {
+    "path": "C:\\Users\\z004n36r\\.agents\\nx_mcp_runs\\integration_003\\01_create_part.py",
+    "working_dir": "C:\\Users\\z004n36r\\.agents\\nx_mcp_runs\\integration_003"
+  },
+  "model": {
+    "body_count": 0,
+    "critical_features": {
+      "work_part": true
+    },
+    "expected_body_count": 0
+  },
+  "nx_version": "NX 2606",
+  "probe": "01_create_part",
+  "result": "success",
+  "run_id": "run_001",
+  "schema_version": 2,
+  "work_part": "C:\\Users\\z004n36r\\.agents\\nx_mcp_runs\\integration_003\\01_create_part_run_001.prt"
+}
+
+#prt文件路径
+"C:\Users\z004n36r\.agents\nx_mcp_runs\integration_003\01_create_part_run_001.prt"
