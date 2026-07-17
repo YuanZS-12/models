@@ -1,0 +1,32 @@
+{
+  "artifacts": {
+    "prt": {},
+    "step": {}
+  },
+  "error": "NX STEP exporter finished but the STEP file was not found: D:\\Workdir\\iproot\\nx2606.1700\\test44\\workspace\\aerospace_bearing_002\\bearing_support_housing.step",
+  "execution": {
+    "actor": "user",
+    "tool": "nx_ui",
+    "transport": "nx_ui"
+  },
+  "journal": {
+    "path": "D:\\Workdir\\iproot\\nx2606.1700\\test44\\workspace\\aerospace_bearing_002\\bearing_support_housing.py",
+    "working_dir": "D:\\Workdir\\iproot\\nx2606.1700\\test44\\workspace\\aerospace_bearing_002"
+  },
+  "model": {
+    "body_count": null,
+    "critical_features": {
+      "bearing_seat": false,
+      "housing": false,
+      "mounting_holes": false
+    },
+    "expected_body_count": 1
+  },
+  "nx_version": "NX 2606",
+  "probe": "nx_benchmark_bearing_housing",
+  "result": "failure",
+  "run_id": "run_002",
+  "schema_version": 2,
+  "source_sha256": "80f4f0bcf35a5a1418a11d4f0e2c0d0bd43abfa688a1ab0b9c735e24542fb436",
+  "warnings": []
+}
