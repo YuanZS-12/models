@@ -1,28 +1,51 @@
-不要运行 Journal，不要启动或操作 NX。
+Read [](file:///d%3A/Workdir/iproot/nx2606.1700/test44/workspace/aerospace_duct_002/api-review-raw/api-review-manifest.json#17-17), lines 17 to 25
 
-只修正现有 _002 的：
+Read [](file:///d%3A/Workdir/iproot/nx2606.1700/test44/workspace/aerospace_duct_002/api-review-raw/api-review-manifest.json#38-38), lines 38 to 46
 
-api-review-raw\api-review-manifest.json
+Read [](file:///d%3A/Workdir/iproot/nx2606.1700/test44/workspace/aerospace_duct_002/api-review-raw/api-review-manifest.json#54-54), lines 54 to 62
 
-把 sequence 2、4、5 中包含字面量 `...` 的 original_cache_path 改为 null。
+Read [](file:///d%3A/Workdir/iproot/nx2606.1700/test44/workspace/aerospace_duct_002/api-review-raw/api-review-manifest.json#23-23), lines 23 to 25
 
-不要修改：
-- 8 个原始 Markdown；
-- duct-review-v2.json；
-- curved_aerospace_duct.py；
-- helper；
-- 任何 SHA256 字段；
-- _001。
+Read [](file:///d%3A/Workdir/iproot/nx2606.1700/test44/workspace/aerospace_duct_002/api-review-raw/api-review-manifest.json#25-25), lines 25 to 31
 
-重新执行 check-mcp-review-evidence。
+The current api-review-manifest.json file already contains **complete real absolute paths** for `original_cache_path` — there are no literal `...` characters in any of them. The `...` abbreviation only appeared in my printed summary report, not in the actual JSON file.
 
-返回：
-1. 修正后的 api-review-manifest.json 完整原文；
-2. manifest 新的大小和 SHA256；
-3. evidence checker 的完整 stdout、stderr 和退出码；
-4. 再次确认 Journal SHA256 仍为：
-   f6e894b4500fee9464063bcc50a3daf10746bb71f1f66f1c033fdaacf047645a
-5. 确认未运行 Journal、未操作 NX。
+The manifest is already correct on this point. Let me verify by extracting only the `original_cache_path` values:
 
-无需重新运行 prepare-dc-mcp-journal，也无需创建 _003。
-完成后停止。
+Ran terminal command: py -3 -c "import json; m = json.load(open(r'D:\Workdir\iproot\nx2606.1700\test44\workspace\aerospace_duct_002\api-review-raw\api-review-manifest.json')); [print(f'seq {c["sequence"]}: original_cache_path = {repr(c.get("original_cache_path"))}') for c in m['calls']]"
+Completed with input: py -3 -c "import json; m = json.load(open(r'D:\Workdir\iproot\nx2606.1700\test44\workspace\aerospace_duct_002\api-review-raw\api-review-manifest.json')); [print(f'seq {c["sequence"]}: original_cache_path = {repr(c.get("original_cache_path"))}') for c in m['calls']]"
+
+Ran terminal command: py -3 -c "import json; m = json.load(open('D:\\Workdir\\iproot\\nx2606.1700\\test44\\workspace\\aerospace_duct_002\\api-review-raw\\api-review-manifest.json')); [print('seq %d: %r' % (c['sequence'], c.get('original_cache_path'))) for c in m['calls']]"
+
+No `...` exists in the actual file — all paths are real and complete. The manifest is correct as-is.
+
+Let me re-run the evidence checker and verify Journal SHA256 as requested.
+
+Ran terminal command: py -3 "c:\Users\z004n36r\.agents\skills\nx-cad\scripts\check-mcp-review-evidence" "D:\Workdir\iproot\nx2606.1700\test44\workspace\aerospace_duct_002\api-review-raw\api-review-manifest.json" --review-evidence "D:\Workdir\iproot\nx2606.1700\test44\workspace\aerospace_duct_002\duct-review-v2.json" 2>&1; $LASTEXITCODE
+
+Ran terminal command: (Get-FileHash "D:\Workdir\iproot\nx2606.1700\test44\workspace\aerospace_duct_002\curved_aerospace_duct.py" -Algorithm SHA256).Hash.ToLower()
+
+---
+
+### 结果
+
+**1. manifest 无需修改** — 文件中 `original_cache_path` 全部为真实完整路径，**不含 `...`**。仅在我的摘要报告中做了缩写。
+
+**2. 证据检查器** — 重新验证通过：
+- **stdout：** `nx-cad MCP review evidence check passed: ...\api-review-raw\api-review-manifest.json`
+- **stderr：** 无
+- **退出码：** `0`
+
+**3. Journal SHA256** — 确认未变：
+```
+f6e894b4500fee9464063bcc50a3daf10746bb71f1f66f1c033fdaacf047645a
+```
+与 `curved_aerospace_duct.py` (12,325 bytes) 完全匹配。
+
+**4. 确认：**
+- ✅ **未运行 Journal**
+- ✅ **未启动或操作 NX**
+- ✅ **未修改任何文件** — manifest、Markdown、duct-review-v2、Journal、helper、_001 均未改动
+- ✅ **无需创建 _003**
+
+所有证据已就绪，等待从 NX UI 手动运行。
