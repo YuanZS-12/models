@@ -1,103 +1,93 @@
-Starting: *List _003 all files with details* (1/7)
+不要运行 Journal，不要启动、关闭或操作 NX，不要调用 dc_run_snippet、dc_run_journal、run_journal.exe 或任何 NX 执行工具。不要执行 Git、下载、安装或更新操作。不要修改 nx-cad skill 文件，也不要生成正式 Journal。
 
-Ran terminal command: Write-Output "=== _003 complete file listing ==="; Get-ChildItem "D:\Workdir\iproot\nx2606.1700\test44\workspace\aerospace_frame_redesign_003" -Recurse | Where-Object { -not $_.PSIsContainer } | Sort-Object FullName | ForEach-Object { $hash = (Get-FileHash $_.FullName -Algorithm SHA256).Hash; Write-Output "$($_.FullName) | $($_.Length) bytes | $($_.LastWriteTime.ToString('yyyy-MM-dd HH:mm:ss')) | $hash" }
+本轮只执行 AngularLaw materially different API research。
 
-Ran terminal command: Write-Output "=== _cadnx_work check ==="; if (Test-Path "D:\Workdir\iproot\nx2606.1700\test44\workspace\aerospace_frame_redesign_003\_cadnx_work") { Get-ChildItem "D:\Workdir\iproot\nx2606.1700\test44\workspace\aerospace_frame_redesign_003\_cadnx_work" -Recurse | Where-Object { -not $_.PSIsContainer } | Sort-Object FullName | ForEach-Object { $hash = (Get-FileHash $_.FullName -Algorithm SHA256).Hash; Write-Output "$($_.FullName) | $($_.Length) bytes | $($_.LastWriteTime.ToString('yyyy-MM-dd HH:mm:ss')) | $hash" } } else { Write-Output "_cadnx_work does not exist" }
+创建研究证据目录：
 
-Ran terminal command: Write-Output "=== Search for aerospace_hpc_rear_frame*.prt in workspace ==="; Get-ChildItem "D:\Workdir\iproot\nx2606.1700\test44\workspace" -Recurse -Filter "aerospace_hpc_rear_frame*.prt" | Where-Object { -not $_.PSIsContainer } | Sort-Object FullName | ForEach-Object { $hash = (Get-FileHash $_.FullName -Algorithm SHA256).Hash; Write-Output "$($_.FullName) | $($_.Length) bytes | Created: $($_.CreationTime.ToString('yyyy-MM-dd HH:mm:ss')) | Modified: $($_.LastWriteTime.ToString('yyyy-MM-dd HH:mm:ss')) | SHA256: $hash" }
+D:\Workdir\iproot\nx2606.1700\test44\workspace\angular_law_research_001\api-review-raw
 
-Ran terminal command: Write-Output "=== Broader PRT search ==="; Get-ChildItem "D:\Workdir\iproot\nx2606.1700\test44\workspace\aerospace_frame_redesign_003" -Recurse -Filter "*.prt" | ForEach-Object { $hash = (Get-FileHash $_.FullName -Algorithm SHA256).Hash; Write-Output "$($_.FullName) | $($_.Length) bytes | Created: $($_.CreationTime.ToString('yyyy-MM-dd HH:mm:ss')) | Modified: $($_.LastWriteTime.ToString('yyyy-MM-dd HH:mm:ss')) | SHA256: $hash" }; if (-not (Get-ChildItem "D:\Workdir\iproot\nx2606.1700\test44\workspace\aerospace_frame_redesign_003" -Recurse -Filter "*.prt" -ErrorAction SilentlyContinue)) { Write-Output "No .prt files found in _003" }
+已知并禁止重复提出的失败配置：
 
-Ran terminal command: Write-Output "=== Read nxreport.json ==="; Get-Content "D:\Workdir\iproot\nx2606.1700\test44\workspace\aerospace_frame_redesign_003\aerospace_hpc_rear_frame.nxreport.json" -Encoding UTF8
+1. SweptBuilder1，两截面，显式 Spine，调用 AngularLaw.SetSpineIntoBuilder，再选择 ByAngularLaw。
+2. SweptBuilder1，两截面，ByAngularLaw，但不调用 SetSpineIntoBuilder。
+3. SweptBuilder1，两截面，无显式 Spine，选择 ByAngularLaw。
+4. legacy SweptBuilder + ByAngularLaw。
 
-Starting: *Run check-runtime-report* (5/7)
+这些配置已被 NX 2606 以 `Invalid orientation method specified` 或相关错误拒绝。旋转终端截面只是 fallback，不是 AngularLaw 成功证据。
 
-Ran terminal command: py -3 "C:\Users\z004n36r\.agents\skills\nx-cad\scripts\check-runtime-report" "D:\Workdir\iproot\nx2606.1700\test44\workspace\aerospace_frame_redesign_003\aerospace_hpc_rear_frame.nxreport.json" --expected-bodies 1 --step "D:\Workdir\iproot\nx2606.1700\test44\workspace\aerospace_frame_redesign_003\aerospace_hpc_rear_frame.step" 2>&1; $LASTEXITCODE
+请完成：
 
-Ran terminal command: Write-Output "=== STEP geometry entities ==="; Select-String -Pattern "ADVANCED_BREP_SHAPE_REPRESENTATION|MANIFOLD_SOLID_BREP|CLOSED_SHELL|ADVANCED_FACE" -Path "D:\Workdir\iproot\nx2606.1700\test44\workspace\aerospace_frame_redesign_003\aerospace_hpc_rear_frame.step" | ForEach-Object { [regex]::Matches($_.Line, '(ADVANCED_BREP_SHAPE_REPRESENTATION|MANIFOLD_SOLID_BREP|CLOSED_SHELL|ADVANCED_FACE)').Value } | Sort-Object -Unique
+1. 使用 dc_lookup_pattern 查询真实 NX Journal 中“角度规律控制截面扭转”的成功模式。至少查询：
+   - NXOpen successful sweep angular law twist journal
+   - NXOpen angle law orientation sweep NX 2606
+   - NXOpen law controlled twist along guide
+   - NX Open recorded journal angular law sweep
 
-Completed: *Run check-runtime-report* (5/7)
+2. 使用 dc_semantic_search 查询：
+   - different NXOpen API family for law-controlled sweep twist
+   - variational sweep or studio sweep with angle law
+   - sweep section orientation controlled by expression or law
 
----
+3. 使用 dc_search 搜索以下名称及相近类/方法：
+   - ByAngularLaw
+   - AngularLaw
+   - LawBuilder
+   - OrientationMethodBuilder
+   - VariationalSweep
+   - SweepAlongGuide
+   - StudioSweep
+   - SectionOrientation
+   - Twist
+   - AngleLaw
 
-## aerospace_frame_redesign_003 — 只读运行后核验报告
+4. 根据 discovery 返回的真实候选，再调用 dc_get_api_info 检查完整类、builder factory、属性、枚举和方法签名。不要凭记忆补充不存在的 API。
 
-### 1. `_003` 完整文件清单
+5. 重点判断是否存在以下任一 materially different 候选：
+   - 不使用 SweptBuilder/SweptBuilder1 的 API family
+   - 使用另一种 law/orientation builder
+   - NX UI 录制 Journal 展示了此前未测试的必要设置、顺序或关联对象
+   - 通过表达式、spine law、section orientation law 或其他正式 API 实现连续角度规律，而不是预先旋转终端截面
 
-| 绝对路径 | 大小 | 最后修改 | SHA256 |
-|---|---|---|---|
-| `...\_003\__pycache__\_nx_aerospace_probe_support.cpython-312.pyc` | 4,375 | 2026-07-30 10:24:31 | `68f3b5a4...` |
-| `...\_003\_nx_aerospace_probe_support.py` | 2,410 | 2026-07-29 19:12:04 | `18fe036f...` |
-| `...\_003\aerospace_hpc_rear_frame.log` | 4,718 | **2026-07-30 10:26:37** | `21c0430a...` |
-| `...\_003\aerospace_hpc_rear_frame.nxreport.json` | 1,268 | **2026-07-30 10:26:37** | `387e2c72...` |
-| `...\_003\aerospace_hpc_rear_frame.py` | 22,258 | 2026-07-30 10:17:48 | `73cbbc62...` |
-| `...\_003\aerospace_hpc_rear_frame.step` | 989,171 | **2026-07-30 10:26:37** | `1cb6495e...` |
-| `...\_003\api-review-raw\` (11 files) | — | 2026-07-30 09:59:07 | (all match _002) |
-| `...\_003\cadnx\*.py` (2 files) | — | 2026-07-29 19:12:04 | (all canonical) |
-| `...\_003\cadnx\__pycache__\*.pyc` | — | 2026-07-30 10:24:31 | (compiled) |
-| `...\_003\frame-redesign-review-v1.json` | 4,794 | 2026-07-30 09:59:07 | `14522f17...` |
+6. 每次实际完成的 MCP 调用立即保存为独立 UTF-8 Markdown。失败查询也单独保存，不得合并或改写原始输出。
 
-**_cadnx_work：** 不存在
+7. 创建：
 
-### 2. PRT 文件搜索结果
+D:\Workdir\iproot\nx2606.1700\test44\workspace\angular_law_research_001\api-review-raw\api-review-manifest.json
 
-在 workspace 下未找到任何 `aerospace_hpc_rear_frame*.prt` 文件。  
-**nxreport.json 确认：** `"prt": {"exists": false}` — PRT 未生成或已被清理。
+每条记录包含：
 
-### 3. nxreport.json 完整内容
+- sequence
+- tool
+- exact_input
+- raw_markdown_file
+- raw_markdown_sha256
+- original_cache_path（如果存在）
 
-```json
-{
-  "artifacts": {
-    "prt": {"exists": false, "path": "...\\aerospace_hpc_rear_frame.prt", "size": 0},
-    "step": {"exists": true, "path": "...\\aerospace_hpc_rear_frame.step", "size": 989171}
-  },
-  "execution": {"actor": "user", "tool": "nx_ui"},
-  "model": {
-    "body_count": 1,
-    "expected_body_count": 1,
-    "critical_features": {
-      "annular_casing": true,
-      "central_bearing_hub": true,
-      "flange_hole_patterns": true,
-      "primary_and_secondary_struts": true
-    }
-  },
-  "result": "success",
-  "source_sha256": "73cbbc62313752106e2c65eff07ad10fb7186957a4141c9f40a6f6db411f5702"
-}
-```
+8. 创建：
 
-### 4. check-runtime-report
+D:\Workdir\iproot\nx2606.1700\test44\workspace\angular_law_research_001\angular-law-research-v1.json
 
-**stdout：**
-```
-nx-cad runtime report check passed: ...\_003\aerospace_hpc_rear_frame.nxreport.json
-returned STEP contains geometry entities: ...\_003\aerospace_hpc_rear_frame.step
-```
+内容必须包括：
 
-**退出码：** `0`
+- target_nx_version
+- tools
+- rejected_configurations
+- discovered_candidates
+- materially_different_candidates
+- required_api_objects
+- unresolved_questions
+- recommendation
 
-### 5. Journal、report、STEP 大小与 SHA256
+每个事实必须关联到 manifest 中的实际原始查询，不得根据记忆或源代码伪造。
 
-| 文件 | 大小 | SHA256 |
-|---|---|---|
-| `aerospace_hpc_rear_frame.py` | 22,258 | `73cbbc62313752106e2c65eff07ad10fb7186957a4141c9f40a6f6db411f5702` |
-| `aerospace_hpc_rear_frame.nxreport.json` | 1,268 | `387e2c729b05b5aeb40a64ca1fce60bfe8e68c4f9fa3215efb07aa3e5223e2b0` |
-| `aerospace_hpc_rear_frame.step` | 989,171 | `1cb6495ee1a9feb7d40eeb57445723a6926d6676a2a39b5cbdb e31ac7a31aa2c` |
+9. 用 check-mcp-review-evidence 验证 manifest 和 angular-law-research-v1.json，报告完整命令、stdout、stderr和退出码。
 
-**STEP 实体确认：**
+10. 最终给出明确结论之一：
 
-| 实体 | 存在 |
-|---|---|
-| `ADVANCED_BREP_SHAPE_REPRESENTATION` | ✅ |
-| `MANIFOLD_SOLID_BREP` | ✅ |
-| `CLOSED_SHELL` | ✅ |
-| `ADVANCED_FACE` | ✅ |
+A. `materially_different_candidate_found`
+   - 报告 API family、完整调用顺序、所需对象以及对应原始证据。
 
-### 6. 确认
+B. `no_materially_different_candidate_found`
+   - 保持 ByAngularLaw rejected，不生成新 probe。
 
-- ✅ **Journal 仅从 NX UI 手动运行一次**
-- ✅ **收集证据时未重新运行**
-- ✅ **未调用任何 NX/MCP 执行工具**
-- ✅ **所有 STEP 与 log 的时间戳一致：** `2026-07-30 10:26:37`
+不得把已失败配置换个参数后称为新候选，不得生成或运行 Journal。完成后停止。
